@@ -6,3 +6,39 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id             String     @id @default(cuid())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  username       String     @unique
+  hashedPassword String
+  Chatrooms      Chatroom[]
+  Message        Message[]
+
+  @@map("users")
+}
+
+model Chatroom {
+  id       String    @id @default(cuid())
+  users    User[]
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chatrooms")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  Chatroom   Chatroom @relation(fields: [chatroomId], references: [id])
+  chatroomId String
+
+  @@map("messages")
+}
