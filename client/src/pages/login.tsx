@@ -15,7 +15,7 @@ const Login: NextPage = () => {
           <h1 className='w-full text-center text-6xl text-my-cyan-light'>
             Login
           </h1>
-          <div className='flex flex-col w-full space-y-2 max-w-[350px] mx-auto'>
+          <div className='flex flex-col w-full space-y-3 max-w-[350px] mx-auto'>
             <Input label='Username' placeholder='Enter username...' />
             <Input
               label='Password'
@@ -38,7 +38,7 @@ const Login: NextPage = () => {
               .
             </p>
             <div className='w-full flex justify-center items-center pt-5'>
-              <button className='btn my-bg-cyan text-xl min-w-[120px] py-2'>
+              <button className='btn my-bg-cyan text-xl min-w-[120px] py-2 text-my-dark-dark font-bold'>
                 Login
               </button>
             </div>
