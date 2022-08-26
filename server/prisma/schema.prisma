@@ -21,7 +21,9 @@ model User {
 
 model Chatroom {
   id   String @id @default(cuid())
-  name String
+  name String @unique
+
+  privacyMode PrivacyMode @default(PUBLIC)
 
   users    User[]
   messages Message[]
@@ -30,6 +32,11 @@ model Chatroom {
   updatedAt DateTime @updatedAt
 
   @@map("chatrooms")
+}
+
+enum PrivacyMode {
+  PUBLIC
+  PRIVATE
 }
 
 model Message {
