@@ -3,3 +3,5 @@ export enum Routes {
   CHATROOMS = 'chatrooms',
   MESSAGES = 'messages',
 }
+
+export const FRONTEND_ORIGIN = 'http://localhost:3000';
