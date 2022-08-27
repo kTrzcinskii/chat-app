@@ -32,17 +32,22 @@ export class ChatroomsService {
   }
 
   async getChatroom(userId: string, chatroomId: string) {
-    //todo: messages pagination
-    const chatroom = await this.prisma.chatroom.findFirst({
-      where: { id: chatroomId, users: { some: { id: userId } } },
+    const chatroom = await this.prisma.chatroom.findUnique({
+      where: { id: chatroomId },
       include: {
         users: { select: { id: true, username: true } },
-        messages: true,
       },
     });
     if (!chatroom) {
       throw new NotFoundException('Chatroom not found');
     }
+
+    if (chatroom.users.filter((user) => user.id === userId).length === 0) {
+      throw new ForbiddenException(
+        "You don't have permission to see the data of this chatroom",
+      );
+    }
+
     return { chatroom };
   }
 
