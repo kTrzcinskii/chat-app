@@ -46,7 +46,7 @@ model Message {
   author   User   @relation(fields: [authorId], references: [id])
   authorId String
 
-  Chatroom   Chatroom @relation(fields: [chatroomId], references: [id])
+  Chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
   chatroomId String
 
   content String
