@@ -49,5 +49,7 @@ model Message {
   Chatroom   Chatroom @relation(fields: [chatroomId], references: [id])
   chatroomId String
 
+  content String
+
   @@map("messages")
 }
