@@ -5,14 +5,17 @@ import {
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ChatroomQueryParamDto } from './dtos/ChatroomQueryParam.dto';
 import CreateChatroomDto from './dtos/CreateChatroom.dto';
 
 @Injectable()
 export class ChatroomsService {
   constructor(private prisma: PrismaService) {}
 
-  async getUserChatrooms(userId: string) {
-    //TODO: chatrooms pagination
+  async getUserChatrooms(userId: string, query: ChatroomQueryParamDto) {
+    const limit = query.limit ?? 10;
+    const cursor = query.cursor && { id: query.cursor };
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -21,14 +24,23 @@ export class ChatroomsService {
             messages: { take: 1, orderBy: { createdAt: 'desc' } },
             users: { select: { username: true, id: true } },
           },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+          cursor,
+          skip: query.cursor ? 1 : 0,
+          take: limit,
         },
       },
     });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    return { chatrooms: user.Chatrooms };
+    const newCursor = user.Chatrooms[limit - 1]?.id;
+
+    return { chatrooms: user.Chatrooms, newCursor };
   }
 
   async getChatroom(userId: string, chatroomId: string) {

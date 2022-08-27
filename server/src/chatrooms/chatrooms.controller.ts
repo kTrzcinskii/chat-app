@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { Routes } from 'src/utils/constants';
 import { JwtAuthGuard } from 'src/utils/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/AuthenticatedRequest.type';
 import { ChatroomsService } from './chatrooms.service';
+import { ChatroomQueryParamDto } from './dtos/ChatroomQueryParam.dto';
 import CreateChatroomDto from './dtos/CreateChatroom.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -19,8 +21,11 @@ export class ChatroomsController {
   constructor(private chatroomsService: ChatroomsService) {}
 
   @Get()
-  async getUserChatrooms(@Request() req: AuthenticatedRequest) {
-    return this.chatroomsService.getUserChatrooms(req.user.userId);
+  async getUserChatrooms(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: ChatroomQueryParamDto,
+  ) {
+    return this.chatroomsService.getUserChatrooms(req.user.userId, query);
   }
 
   @Get(':id')
