@@ -7,9 +7,13 @@ import { useState } from "react";
 import { LoginSchema, ILoginSchema } from "../utils/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import useLogin from "../hooks/mutation/useLogin";
+import axios from "axios";
 
 const Login: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { mutate } = useLogin();
 
   const {
     register,
@@ -21,7 +25,17 @@ const Login: NextPage = () => {
   });
 
   const onSubmit = (values: ILoginSchema) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: (r) => console.log(r.data),
+      onError: (e) => {
+        if (axios.isAxiosError(e)) {
+          console.log(e.response?.data);
+          //TODO: handle errors
+          return;
+        }
+        throw new Error(e.message);
+      },
+    });
   };
 
   return (
