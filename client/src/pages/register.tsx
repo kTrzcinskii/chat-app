@@ -4,10 +4,38 @@ import FormContainer from "../components/home/FormContainer";
 import Input from "../components/home/Input";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  RegisterSchema,
+  RegisterSchemaType,
+} from "../utils/schemas/RegisterSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const Register: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<RegisterSchemaType>({
+    resolver: zodResolver(RegisterSchema),
+  });
+
+  const onSubmit = (values: RegisterSchemaType) => {
+    if (values.confirmPassword !== values.password) {
+      setError("password", {
+        message: "Passwords must match.",
+      });
+      setError("confirmPassword", {
+        message: "Passwords must match.",
+      });
+      return;
+    }
+    console.log(values);
+  };
 
   return (
     <div className='min-h-screen w-screen bg-my-gray-light flex justify-center items-center'>
@@ -16,47 +44,67 @@ const Register: NextPage = () => {
           <h1 className='w-full text-center text-6xl text-my-cyan-light'>
             Register
           </h1>
-          <div className='flex flex-col w-full space-y-3 max-w-[350px] mx-auto'>
-            <Input label='Username' placeholder='Enter username...' />
-            <Input
-              label='Password'
-              placeholder='Enter password...'
-              icon={
-                showPassword ? (
-                  <AiFillEyeInvisible size={26} />
-                ) : (
-                  <AiFillEye size={26} />
-                )
-              }
-              setShowPassword={setShowPassword}
-              type={showPassword ? "text" : "password"}
-            />
-            <Input
-              label='Confirm Password'
-              placeholder='Confirm password...'
-              icon={
-                showPassword2 ? (
-                  <AiFillEyeInvisible size={26} />
-                ) : (
-                  <AiFillEye size={26} />
-                )
-              }
-              setShowPassword={setShowPassword2}
-              type={showPassword2 ? "text" : "password"}
-            />
-            <p className='pt-3 text-white'>
-              Already have an account? Login{" "}
-              <Link passHref href='/login'>
-                <a className='text-my-cyan-light hover:underline'>here</a>
-              </Link>
-              .
-            </p>
-            <div className='w-full flex justify-center items-center pt-5'>
-              <button className='btn my-bg-cyan text-xl min-w-[120px] py-2 text-my-dark-dark font-bold'>
-                Register
-              </button>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className='flex flex-col w-full space-y-3 max-w-[350px] mx-auto'>
+              <Input
+                label='Username'
+                placeholder='Enter username...'
+                id='username'
+                register={register}
+                registerName='username'
+                errors={errors}
+              />
+              <Input
+                id='password'
+                label='Password'
+                placeholder='Enter password...'
+                icon={
+                  showPassword ? (
+                    <AiFillEyeInvisible size={26} />
+                  ) : (
+                    <AiFillEye size={26} />
+                  )
+                }
+                setShowPassword={setShowPassword}
+                type={showPassword ? "text" : "password"}
+                register={register}
+                registerName='password'
+                errors={errors}
+              />
+              <Input
+                id='confirm-password'
+                label='Confirm Password'
+                placeholder='Confirm password...'
+                icon={
+                  showPassword2 ? (
+                    <AiFillEyeInvisible size={26} />
+                  ) : (
+                    <AiFillEye size={26} />
+                  )
+                }
+                setShowPassword={setShowPassword2}
+                type={showPassword2 ? "text" : "password"}
+                register={register}
+                registerName='confirmPassword'
+                errors={errors}
+              />
+              <p className='pt-3 text-white'>
+                Already have an account? Login{" "}
+                <Link passHref href='/login'>
+                  <a className='text-my-cyan-light hover:underline'>here</a>
+                </Link>
+                .
+              </p>
+              <div className='w-full flex justify-center items-center pt-5'>
+                <button
+                  type='submit'
+                  className='btn my-bg-cyan text-xl min-w-[120px] py-2 text-my-dark-dark font-bold'
+                >
+                  Register
+                </button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </FormContainer>
     </div>
