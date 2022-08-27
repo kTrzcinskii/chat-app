@@ -4,17 +4,29 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import AllMessagesQueryParamDto from './dtos/AllMessagesQueryParam.dto';
 
 @Injectable()
 export class MessagesService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllMessagesFromChatroom(chatroomId: string, userId: string) {
-    //todo: messages pagination
+  async getAllMessagesFromChatroom(
+    chatroomId: string,
+    userId: string,
+    query: AllMessagesQueryParamDto,
+  ) {
+    const limit = query.limit ?? 30;
+    const cursor = query.cursor && { id: query.cursor };
+
     const chatroom = await this.prisma.chatroom.findUnique({
       where: { id: chatroomId },
       include: {
-        messages: { orderBy: { createdAt: 'desc' } },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          cursor,
+          skip: query.cursor ? 1 : 0,
+          take: limit,
+        },
         users: { select: { id: true } },
       },
     });
@@ -29,6 +41,8 @@ export class MessagesService {
       );
     }
 
-    return { messages: chatroom.messages };
+    const newCursor = chatroom.messages[limit - 1]?.id;
+
+    return { messages: chatroom.messages, newCursor };
   }
 }

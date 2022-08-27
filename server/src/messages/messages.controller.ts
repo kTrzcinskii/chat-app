@@ -1,7 +1,15 @@
-import { Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { Routes } from 'src/utils/constants';
 import { JwtAuthGuard } from 'src/utils/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/AuthenticatedRequest.type';
+import AllMessagesQueryParamDto from './dtos/AllMessagesQueryParam.dto';
 import { MessagesService } from './messages.service';
 
 @UseGuards(JwtAuthGuard)
@@ -13,10 +21,12 @@ export class MessagesController {
   async getAllMessagesFromChatroom(
     @Request() req: AuthenticatedRequest,
     @Param('chatroomId') chatroomId: string,
+    @Query() query: AllMessagesQueryParamDto,
   ) {
     return this.messagesService.getAllMessagesFromChatroom(
       chatroomId,
       req.user.userId,
+      query,
     );
   }
 }
