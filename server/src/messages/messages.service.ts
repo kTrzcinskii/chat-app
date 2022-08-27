@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import AllMessagesQueryParamDto from './dtos/AllMessagesQueryParam.dto';
+import CreateMessageDto from './dtos/CreateMessage.dto';
 
 @Injectable()
 export class MessagesService {
@@ -44,5 +45,39 @@ export class MessagesService {
     const newCursor = chatroom.messages[limit - 1]?.id;
 
     return { messages: chatroom.messages, newCursor };
+  }
+
+  async createMessage(
+    userId: string,
+    chatroomId: string,
+    dto: CreateMessageDto,
+  ) {
+    const chatroom = await this.prisma.chatroom.findUnique({
+      where: { id: chatroomId },
+      include: {
+        users: {
+          select: { id: true },
+        },
+      },
+    });
+    if (!chatroom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+
+    if (chatroom.users.filter((user) => user.id === userId).length === 0) {
+      throw new ForbiddenException(
+        "You don't have permission to create message in this chatroom",
+      );
+    }
+
+    const newMessage = await this.prisma.message.create({
+      data: {
+        content: dto.content,
+        author: { connect: { id: userId } },
+        Chatroom: { connect: { id: chatroomId } },
+      },
+    });
+
+    return { newMessage };
   }
 }

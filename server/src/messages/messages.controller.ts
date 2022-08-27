@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
+  Post,
   Query,
   Request,
   UseGuards,
@@ -10,6 +12,7 @@ import { Routes } from 'src/utils/constants';
 import { JwtAuthGuard } from 'src/utils/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/AuthenticatedRequest.type';
 import AllMessagesQueryParamDto from './dtos/AllMessagesQueryParam.dto';
+import CreateMessageDto from './dtos/CreateMessage.dto';
 import { MessagesService } from './messages.service';
 
 @UseGuards(JwtAuthGuard)
@@ -28,5 +31,14 @@ export class MessagesController {
       req.user.userId,
       query,
     );
+  }
+
+  @Post(':chatroomId')
+  async createMessage(
+    @Request() req: AuthenticatedRequest,
+    @Param('chatroomId') chatroomId: string,
+    @Body() dto: CreateMessageDto,
+  ) {
+    return this.messagesService.createMessage(req.user.userId, chatroomId, dto);
   }
 }
