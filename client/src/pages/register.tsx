@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   RegisterSchema,
-  RegisterSchemaType,
+  IRegisterSchema,
 } from "../utils/schemas/RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -20,11 +20,11 @@ const Register: NextPage = () => {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<RegisterSchemaType>({
+  } = useForm<IRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
   });
 
-  const onSubmit = (values: RegisterSchemaType) => {
+  const onSubmit = (values: IRegisterSchema) => {
     if (values.confirmPassword !== values.password) {
       setError("password", {
         message: "Passwords must match.",

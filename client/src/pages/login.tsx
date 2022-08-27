@@ -4,7 +4,7 @@ import FormContainer from "../components/home/FormContainer";
 import Input from "../components/home/Input";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
-import { LoginSchema, LoginSchemaType } from "../utils/schemas/LoginSchema";
+import { LoginSchema, ILoginSchema } from "../utils/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -16,11 +16,11 @@ const Login: NextPage = () => {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<LoginSchemaType>({
+  } = useForm<ILoginSchema>({
     resolver: zodResolver(LoginSchema),
   });
 
-  const onSubmit = (values: LoginSchemaType) => {
+  const onSubmit = (values: ILoginSchema) => {
     console.log(values);
   };
 
