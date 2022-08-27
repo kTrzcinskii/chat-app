@@ -10,10 +10,14 @@ import {
   IRegisterSchema,
 } from "../utils/schemas/RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import useRegister from "../hooks/mutation/useRegister";
+import axios from "axios";
 
 const Register: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+
+  const { mutate } = useRegister();
 
   const {
     register,
@@ -34,7 +38,17 @@ const Register: NextPage = () => {
       });
       return;
     }
-    console.log(values);
+    mutate(values, {
+      onSuccess: (r) => console.log(r.data),
+      onError: (e) => {
+        if (axios.isAxiosError(e)) {
+          console.log(e.response?.data);
+          //TODO: handle errors
+          return;
+        }
+        throw new Error(e.message);
+      },
+    });
   };
 
   return (
