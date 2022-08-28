@@ -9,11 +9,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import useLogin from "../hooks/mutation/useLogin";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 const Login: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const { mutate } = useLogin();
+  const router = useRouter();
 
   const {
     register,
@@ -26,11 +28,17 @@ const Login: NextPage = () => {
 
   const onSubmit = (values: ILoginSchema) => {
     mutate(values, {
-      onSuccess: (r) => console.log(r.data),
+      onSuccess: (r) => {
+        localStorage.setItem("access_token", r.data.access_token);
+        router.push("/chatrooms");
+      },
       onError: (e) => {
         if (axios.isAxiosError(e)) {
           console.log(e.response?.data);
-          //TODO: handle errors
+          if (e.response?.data.statusCode === 401) {
+            setError("username", { message: "Incorrect credentials" });
+            setError("password", { message: "Incorrect credentials" });
+          }
           return;
         }
         throw new Error(e.message);

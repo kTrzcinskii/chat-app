@@ -12,12 +12,14 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import useRegister from "../hooks/mutation/useRegister";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 const Register: NextPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
 
   const { mutate } = useRegister();
+  const router = useRouter();
 
   const {
     register,
@@ -39,11 +41,16 @@ const Register: NextPage = () => {
       return;
     }
     mutate(values, {
-      onSuccess: (r) => console.log(r.data),
+      onSuccess: (r) => {
+        localStorage.setItem("access_token", r.data.access_token);
+        router.push("/chatrooms");
+      },
       onError: (e) => {
         if (axios.isAxiosError(e)) {
           console.log(e.response?.data);
-          //TODO: handle errors
+          if (e.response?.data.statusCode === 403) {
+            setError("username", { message: "Username already in use" });
+          }
           return;
         }
         throw new Error(e.message);
