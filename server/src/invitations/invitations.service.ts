@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import InvitationsQueryParamDto from './dtos/InvitationsQueryParam.dto';
 import SentInvitationDto from './dtos/SentInvitation.dto';
 
 @Injectable()
@@ -27,8 +28,9 @@ export class InvitationsService {
     }
   }
 
-  async getAllInvitations(userId: string) {
-    //todo: add pagination
+  async getAllInvitations(userId: string, query: InvitationsQueryParamDto) {
+    const limit = query.limit ?? 10;
+    const cursor = query.cursor && { id: query.cursor };
 
     const invitations = await this.prisma.invitation.findMany({
       where: { invitedUserId: userId },
@@ -36,6 +38,10 @@ export class InvitationsService {
         Chatroom: { select: { id: true, name: true } },
         invitedBy: { select: { id: true, username: true } },
       },
+      orderBy: { createdAt: 'desc' },
+      cursor,
+      skip: query.cursor ? 1 : 0,
+      take: limit,
     });
 
     const mappedInvitations = invitations.map((invitation) => {
@@ -46,7 +52,9 @@ export class InvitationsService {
       };
     });
 
-    return { invitations: mappedInvitations };
+    const newCursor = mappedInvitations[limit - 1]?.invitationId;
+
+    return { invitations: mappedInvitations, newCursor };
   }
 
   async sentInvitation(

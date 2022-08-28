@@ -4,12 +4,14 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { Routes } from 'src/utils/constants';
 import { JwtAuthGuard } from 'src/utils/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/AuthenticatedRequest.type';
+import InvitationsQueryParamDto from './dtos/InvitationsQueryParam.dto';
 import SentInvitationDto from './dtos/SentInvitation.dto';
 import { InvitationsService } from './invitations.service';
 
@@ -19,8 +21,11 @@ export class InvitationsController {
   constructor(private invitationsService: InvitationsService) {}
 
   @Get()
-  async getAllInvitations(@Request() req: AuthenticatedRequest) {
-    return this.invitationsService.getAllInvitations(req.user.userId);
+  async getAllInvitations(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: InvitationsQueryParamDto,
+  ) {
+    return this.invitationsService.getAllInvitations(req.user.userId, query);
   }
 
   @Get(':id')
