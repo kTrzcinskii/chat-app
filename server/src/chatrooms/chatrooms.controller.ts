@@ -14,13 +14,14 @@ import { AuthenticatedRequest } from 'src/utils/types/AuthenticatedRequest.type'
 import { ChatroomsService } from './chatrooms.service';
 import { ChatroomQueryParamDto } from './dtos/ChatroomQueryParam.dto';
 import CreateChatroomDto from './dtos/CreateChatroom.dto';
+import SearchChatroomQueryParamDto from './dtos/SearchChatroomQueryParam.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller(Routes.CHATROOMS)
 export class ChatroomsController {
   constructor(private chatroomsService: ChatroomsService) {}
 
-  @Get()
+  @Get('')
   async getUserChatrooms(
     @Request() req: AuthenticatedRequest,
     @Query() query: ChatroomQueryParamDto,
@@ -28,12 +29,17 @@ export class ChatroomsController {
     return this.chatroomsService.getUserChatrooms(req.user.userId, query);
   }
 
-  @Get(':id')
+  @Get('single/:id')
   async getChatroom(
     @Request() req: AuthenticatedRequest,
     @Param('id') chatroomId: string,
   ) {
     return this.chatroomsService.getChatroom(req.user.userId, chatroomId);
+  }
+
+  @Get('search')
+  async searchChatrooms(@Query() query: SearchChatroomQueryParamDto) {
+    return this.chatroomsService.searchChatrooms(query);
   }
 
   @Post('create')

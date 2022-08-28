@@ -7,6 +7,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatroomQueryParamDto } from './dtos/ChatroomQueryParam.dto';
 import CreateChatroomDto from './dtos/CreateChatroom.dto';
+import SearchChatroomQueryParamDto from './dtos/SearchChatroomQueryParam.dto';
 
 @Injectable()
 export class ChatroomsService {
@@ -61,6 +62,22 @@ export class ChatroomsService {
     }
 
     return { chatroom };
+  }
+
+  async searchChatrooms(query: SearchChatroomQueryParamDto) {
+    const limit = query.limit ?? 10;
+    const cursor = query.cursor && { id: query.cursor };
+
+    const chatrooms = await this.prisma.chatroom.findMany({
+      where: { name: { contains: query.name } },
+      cursor,
+      skip: query.cursor ? 1 : 0,
+      take: limit,
+    });
+
+    const newCursor = chatrooms[limit - 1]?.id;
+
+    return { chatrooms, newCursor };
   }
 
   async createChatroom(dto: CreateChatroomDto, authorId: string) {
