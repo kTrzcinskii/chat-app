@@ -8,28 +8,28 @@ datasource db {
 }
 
 model User {
-  id             String     @id @default(cuid())
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  username       String     @unique
-  hashedPassword String
-  Chatrooms      Chatroom[]
-  Message        Message[]
+  id                  String       @id @default(cuid())
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  username            String       @unique
+  hashedPassword      String
+  Chatrooms           Chatroom[]
+  Message             Message[]
+  InvitationsSent     Invitation[] @relation(name: "invitations-sent")
+  InvitationsRecieved Invitation[] @relation(name: "invitations-recieved")
 
   @@map("users")
 }
 
 model Chatroom {
-  id   String @id @default(cuid())
-  name String @unique
-
-  privacyMode PrivacyMode @default(PUBLIC)
-
-  users    User[]
-  messages Message[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(cuid())
+  name        String       @unique
+  privacyMode PrivacyMode  @default(PUBLIC)
+  users       User[]
+  messages    Message[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  Invitations Invitation[]
 
   @@map("chatrooms")
 }
@@ -40,16 +40,26 @@ enum PrivacyMode {
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String
-
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
   Chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
   chatroomId String
-
-  content String
+  content    String
 
   @@map("messages")
+}
+
+model Invitation {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  invitedBy     User     @relation(fields: [invitedById], references: [id], name: "invitations-sent")
+  invitedById   String
+  invitedUser   User     @relation(fields: [invitedUserId], references: [id], name: "invitations-recieved")
+  invitedUserId String
+  Chatroom      Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
+  chatroomId    String
+
+  @@map("invitations")
 }
