@@ -132,4 +132,25 @@ export class InvitationsService {
 
     return { invitation: newInvitation };
   }
+
+  async deleteInvitation(userId: string, invitationId: string) {
+    const invitation = await this.prisma.invitation.findUnique({
+      where: { id: invitationId },
+    });
+    if (!invitation) {
+      throw new NotFoundException('Invitation not found');
+    }
+
+    if (
+      invitation.invitedById !== userId &&
+      invitation.invitedUserId !== userId
+    ) {
+      throw new ForbiddenException(
+        "You don't have permission to delete this invitation",
+      );
+    }
+
+    await this.prisma.invitation.delete({ where: { id: invitationId } });
+    return { successful: true };
+  }
 }

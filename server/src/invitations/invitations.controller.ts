@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -48,6 +49,17 @@ export class InvitationsController {
       req.user.username,
       req.user.userId,
       dto,
+    );
+  }
+
+  @Delete(':invitationId')
+  async deleteInvitation(
+    @Request() req: AuthenticatedRequest,
+    @Param('invitationId') invitationId: string,
+  ) {
+    return this.invitationsService.deleteInvitation(
+      req.user.userId,
+      invitationId,
     );
   }
 }
