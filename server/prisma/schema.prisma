@@ -17,6 +17,7 @@ model User {
   Message             Message[]
   InvitationsSent     Invitation[] @relation(name: "invitations-sent")
   InvitationsRecieved Invitation[] @relation(name: "invitations-recieved")
+  Requests            Request[]    @relation(name: "requests-sent")
 
   @@map("users")
 }
@@ -30,6 +31,7 @@ model Chatroom {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   Invitations Invitation[]
+  Requests    Request[]
 
   @@map("chatrooms")
 }
@@ -62,4 +64,15 @@ model Invitation {
   chatroomId    String
 
   @@map("invitations")
+}
+
+model Request {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  requestedBy   User     @relation(fields: [requestedById], references: [id], name: "requests-sent")
+  requestedById String
+  Chatroom      Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
+  chatroomId    String
+
+  @@map("requests")
 }
