@@ -21,11 +21,16 @@ export class InvitationsService {
       throw new NotFoundException('Invitation not found');
     }
 
-    if (invitation.invitedUserId !== userId) {
+    if (
+      invitation.invitedUserId !== userId &&
+      invitation.invitedById !== userId
+    ) {
       throw new ForbiddenException(
         "You don't have permission to get this invitation's data",
       );
     }
+
+    return { invitation };
   }
 
   async getAllInvitations(userId: string, query: InvitationsQueryParamDto) {

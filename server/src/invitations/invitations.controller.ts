@@ -28,7 +28,7 @@ export class InvitationsController {
     return this.invitationsService.getAllInvitations(req.user.userId, query);
   }
 
-  @Get(':id')
+  @Get(':invitationId')
   async getSingleInvitation(
     @Request() req: AuthenticatedRequest,
     @Param('invitationId') invitationId: string,
