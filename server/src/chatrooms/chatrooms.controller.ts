@@ -49,4 +49,12 @@ export class ChatroomsController {
   ) {
     return this.chatroomsService.createChatroom(dto, req.user.userId);
   }
+
+  @Post('join/:chatroomId')
+  async joinChatroom(
+    @Request() req: AuthenticatedRequest,
+    @Param('chatroomId') chatroomId: string,
+  ) {
+    return this.chatroomsService.joinChatroom(req.user.userId, chatroomId);
+  }
 }

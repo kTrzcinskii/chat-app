@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { InvitationsService } from 'src/invitations/invitations.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatroomQueryParamDto } from './dtos/ChatroomQueryParam.dto';
 import CreateChatroomDto from './dtos/CreateChatroom.dto';
@@ -11,7 +13,10 @@ import SearchChatroomQueryParamDto from './dtos/SearchChatroomQueryParam.dto';
 
 @Injectable()
 export class ChatroomsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private invitationsService: InvitationsService,
+  ) {}
 
   async getUserChatrooms(userId: string, query: ChatroomQueryParamDto) {
     const limit = query.limit ?? 10;
@@ -106,6 +111,40 @@ export class ChatroomsService {
         );
       }
       throw error;
+    }
+  }
+
+  async joinChatroom(userId, chatroomId) {
+    const chatroom = await this.prisma.chatroom.findUnique({
+      where: { id: chatroomId },
+      include: { users: { select: { id: true } } },
+    });
+
+    if (!chatroom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+
+    if (chatroom.users.filter((user) => user.id === userId).length !== 0) {
+      throw new BadRequestException('You have already joined to this chatroom');
+    }
+
+    if (chatroom.privacyMode === 'PUBLIC') {
+      const invitation = await this.prisma.invitation.findFirst({
+        where: { chatroomId, invitedUserId: userId },
+      });
+      if (invitation) {
+        await this.invitationsService.deleteInvitation(userId, invitation.id);
+      }
+      await this.prisma.chatroom.update({
+        where: { id: chatroomId },
+        data: { users: { connect: { id: userId } } },
+      });
+      return { successful: true };
+    }
+
+    if (chatroom.privacyMode === 'PRIVATE') {
+      //todo
+      throw new BadRequestException('not implemented');
     }
   }
 }
