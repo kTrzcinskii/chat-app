@@ -62,10 +62,20 @@ export class InvitationsService {
     senderId: string,
     dto: SentInvitationDto,
   ) {
+    const invitedUser = await this.prisma.user.findUnique({
+      where: { username: dto.sentToUsername },
+      include: { Requests: { select: { chatroomId: true } } },
+    });
+
+    if (!invitedUser) {
+      throw new NotFoundException('User not found');
+    }
+
     const chatroom = await this.prisma.chatroom.findUnique({
       where: { id: dto.chatroomId },
       include: { users: { select: { id: true, username: true } } },
     });
+
     if (!chatroom) {
       throw new NotFoundException('Chatroom not found');
     }
@@ -85,6 +95,15 @@ export class InvitationsService {
         .length !== 0
     ) {
       throw new BadRequestException('User already in the chatroom');
+    }
+
+    if (
+      invitedUser.Requests.filter((req) => req.chatroomId === dto.chatroomId)
+        .length !== 0
+    ) {
+      throw new BadRequestException(
+        'User already made request to join this chatroom - accept this request instead.',
+      );
     }
 
     const checkIfInvitationExist = await this.prisma.invitation.findFirst({
