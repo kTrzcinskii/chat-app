@@ -18,7 +18,9 @@ export class RequestsController {
   async getChatroomRequests() {}
 
   @Post('create')
-  async createRequest() {}
+  async createRequest() {
+    return this.requestsService.createRequest;
+  }
 
   @Post('accept/:requestId')
   async acceptRequest() {}
