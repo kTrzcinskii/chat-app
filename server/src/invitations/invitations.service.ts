@@ -121,12 +121,13 @@ export class InvitationsService {
     const checkIfInvitationExist = await this.prisma.invitation.findFirst({
       where: {
         chatroomId: dto.chatroomId,
-        invitedById: senderId,
         invitedUser: { username: dto.sentToUsername },
       },
     });
     if (checkIfInvitationExist) {
-      throw new BadRequestException('Invitation has already been sent');
+      throw new BadRequestException(
+        'User has already been invited to this chatroom',
+      );
     }
 
     const newInvitation = await this.prisma.invitation.create({
