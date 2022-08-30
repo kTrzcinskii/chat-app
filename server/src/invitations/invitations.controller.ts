@@ -52,6 +52,17 @@ export class InvitationsController {
     );
   }
 
+  @Post('accept/:invitationId')
+  async acceptInvitation(
+    @Request() req: AuthenticatedRequest,
+    @Param('invitationId') invitationId: string,
+  ) {
+    return this.invitationsService.acceptInvitation(
+      req.user.userId,
+      invitationId,
+    );
+  }
+
   @Delete(':invitationId')
   async deleteInvitation(
     @Request() req: AuthenticatedRequest,

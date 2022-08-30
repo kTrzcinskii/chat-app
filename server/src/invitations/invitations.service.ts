@@ -1,16 +1,23 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ChatroomsService } from 'src/chatrooms/chatrooms.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import InvitationsQueryParamDto from './dtos/InvitationsQueryParam.dto';
 import SentInvitationDto from './dtos/SentInvitation.dto';
 
 @Injectable()
 export class InvitationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => ChatroomsService))
+    private chatroomsService: ChatroomsService,
+  ) {}
 
   async getSingleInvitation(userId: string, invitationId: string) {
     const invitation = await this.prisma.invitation.findUnique({
@@ -131,6 +138,11 @@ export class InvitationsService {
     });
 
     return { invitation: newInvitation };
+  }
+
+  async acceptInvitation(userId: string, invitationId: string) {
+    const { invitation } = await this.getSingleInvitation(userId, invitationId);
+    return this.chatroomsService.joinChatroom(userId, invitation.chatroomId);
   }
 
   async deleteInvitation(userId: string, invitationId: string) {
