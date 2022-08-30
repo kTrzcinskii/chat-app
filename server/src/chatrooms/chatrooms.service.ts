@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,6 +17,7 @@ import SearchChatroomQueryParamDto from './dtos/SearchChatroomQueryParam.dto';
 export class ChatroomsService {
   constructor(
     private prisma: PrismaService,
+    @Inject(forwardRef(() => InvitationsService))
     private invitationsService: InvitationsService,
   ) {}
 
@@ -114,7 +117,7 @@ export class ChatroomsService {
     }
   }
 
-  async joinChatroom(userId, chatroomId) {
+  async joinChatroom(userId: string, chatroomId: string) {
     const chatroom = await this.prisma.chatroom.findUnique({
       where: { id: chatroomId },
       include: { users: { select: { id: true } } },
@@ -128,10 +131,11 @@ export class ChatroomsService {
       throw new BadRequestException('You have already joined to this chatroom');
     }
 
+    const invitation = await this.prisma.invitation.findFirst({
+      where: { chatroomId, invitedUserId: userId },
+    });
+
     if (chatroom.privacyMode === 'PUBLIC') {
-      const invitation = await this.prisma.invitation.findFirst({
-        where: { chatroomId, invitedUserId: userId },
-      });
       if (invitation) {
         await this.invitationsService.deleteInvitation(userId, invitation.id);
       }
@@ -143,8 +147,18 @@ export class ChatroomsService {
     }
 
     if (chatroom.privacyMode === 'PRIVATE') {
-      //todo
-      throw new BadRequestException('not implemented');
+      //todo: implement request
+      if (!invitation) {
+        throw new ForbiddenException(
+          "You can't join private chatroom without invitation",
+        );
+      }
+      await this.invitationsService.deleteInvitation(userId, invitation.id);
+      await this.prisma.chatroom.update({
+        where: { id: chatroomId },
+        data: { users: { connect: { id: userId } } },
+      });
+      return { successful: true };
     }
   }
 }
