@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -48,5 +49,46 @@ export class RequestsService {
     });
 
     return { request: newRequest };
+  }
+
+  async acceptRequest(userId: string, requestId: string) {
+    const request = await this.prisma.request.findUnique({
+      where: { id: requestId },
+      include: { Chatroom: { select: { users: { select: { id: true } } } } },
+    });
+
+    if (!request) {
+      throw new NotFoundException('Request not found');
+    }
+    if (
+      request.Chatroom.users.filter((user) => user.id === userId).length === 0
+    ) {
+      throw new ForbiddenException("You can't accept this request");
+    }
+
+    await this.prisma.chatroom.update({
+      where: { id: request.chatroomId },
+      data: { users: { connect: { id: request.requestedById } } },
+    });
+    await this.deleteRequest(userId, requestId);
+    return { successful: true };
+  }
+
+  async deleteRequest(userId: string, requestId: string) {
+    const request = await this.prisma.request.findUnique({
+      where: { id: requestId },
+      include: { Chatroom: { select: { users: { select: { id: true } } } } },
+    });
+    if (!request) {
+      throw new NotFoundException('Request not found');
+    }
+    if (
+      request.requestedById !== userId &&
+      request.Chatroom.users.filter((user) => user.id === userId).length === 0
+    ) {
+      throw new ForbiddenException("You can't delete this request");
+    }
+    await this.prisma.request.delete({ where: { id: requestId } });
+    return { successful: true };
   }
 }
