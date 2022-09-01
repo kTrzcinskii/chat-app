@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import CreateRequestDto from './dtos/CreateRequest.dto';
+import RequestQueryParamDto from './dtos/RequestQueryParam.dto';
 
 @Injectable()
 export class RequestsService {
@@ -38,6 +39,15 @@ export class RequestsService {
     if (invitation) {
       throw new BadRequestException(
         'You have already been invited to this chatroom',
+      );
+    }
+
+    const request = await this.prisma.request.findFirst({
+      where: { chatroomId: dto.chatroomId, requestedById: userId },
+    });
+    if (request) {
+      throw new BadRequestException(
+        'You have already made a request to join this chatroom',
       );
     }
 
@@ -110,5 +120,26 @@ export class RequestsService {
     const { Chatroom, ...actualRequest } = request;
 
     return { request: actualRequest };
+  }
+
+  async getUserRequests(userId: string, query: RequestQueryParamDto) {
+    const limit = query.limit ?? 20;
+    const cursor = query.cursor && { id: query.cursor };
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        Requests: {
+          cursor,
+          skip: query.cursor ? 1 : 0,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    const newCursor = user.Requests[limit - 1]?.id;
+
+    return { requestes: user.Requests, newCursor };
   }
 }

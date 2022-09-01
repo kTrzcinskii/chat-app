@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { Routes } from 'src/utils/constants';
 import { JwtAuthGuard } from 'src/utils/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/utils/types/AuthenticatedRequest.type';
 import CreateRequestDto from './dtos/CreateRequest.dto';
+import RequestQueryParamDto from './dtos/RequestQueryParam.dto';
 import { RequestsService } from './requests.service';
 
 @UseGuards(JwtAuthGuard)
@@ -20,7 +22,12 @@ export class RequestsController {
   constructor(private requestsService: RequestsService) {}
 
   @Get('all')
-  async getAllUserRequests() {}
+  async getAllUserRequests(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: RequestQueryParamDto,
+  ) {
+    return this.requestsService.getUserRequests(req.user.userId, query);
+  }
 
   @Get('single/:requestId')
   async getSingleRequest(
