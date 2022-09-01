@@ -91,4 +91,24 @@ export class RequestsService {
     await this.prisma.request.delete({ where: { id: requestId } });
     return { successful: true };
   }
+
+  async getSingleRequest(userId: string, requestId: string) {
+    const request = await this.prisma.request.findUnique({
+      where: { id: requestId },
+      include: { Chatroom: { select: { users: { select: { id: true } } } } },
+    });
+    if (!request) {
+      throw new NotFoundException('Request not found');
+    }
+    if (
+      request.requestedById !== userId &&
+      request.Chatroom.users.filter((user) => user.id === userId).length === 0
+    ) {
+      throw new ForbiddenException("You can't access this request");
+    }
+
+    const { Chatroom, ...actualRequest } = request;
+
+    return { request: actualRequest };
+  }
 }

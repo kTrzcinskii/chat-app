@@ -23,7 +23,12 @@ export class RequestsController {
   async getAllUserRequests() {}
 
   @Get('single/:requestId')
-  async getSingleRequest() {}
+  async getSingleRequest(
+    @Request() req: AuthenticatedRequest,
+    @Param('requestId') requestId: string,
+  ) {
+    return this.requestsService.getSingleRequest(req.user.userId, requestId);
+  }
 
   @Get('/chatroom/:chatroomId')
   async getChatroomRequests() {}
