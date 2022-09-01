@@ -140,6 +140,38 @@ export class RequestsService {
 
     const newCursor = user.Requests[limit - 1]?.id;
 
-    return { requestes: user.Requests, newCursor };
+    return { requests: user.Requests, newCursor };
+  }
+
+  async getChatroomRequests(
+    userId: string,
+    query: RequestQueryParamDto,
+    chatroomId: string,
+  ) {
+    const limit = query.limit ?? 20;
+    const cursor = query.cursor && { id: query.cursor };
+
+    const chatroom = await this.prisma.chatroom.findUnique({
+      where: { id: chatroomId },
+      include: {
+        users: { select: { id: true } },
+        Requests: {
+          cursor,
+          skip: query.cursor ? 1 : 0,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    if (!chatroom) {
+      throw new NotFoundException('Chatroom not found');
+    }
+    if (chatroom.users.filter((user) => user.id === userId).length === 0) {
+      throw new ForbiddenException("You can't see this chatroom's requests");
+    }
+
+    const newCursor = chatroom.Requests[limit - 1]?.id;
+    return { requests: chatroom.Requests, newCursor };
   }
 }

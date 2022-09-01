@@ -38,7 +38,17 @@ export class RequestsController {
   }
 
   @Get('/chatroom/:chatroomId')
-  async getChatroomRequests() {}
+  async getChatroomRequests(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: RequestQueryParamDto,
+    @Param('chatroomId') chatroomId: string,
+  ) {
+    return this.requestsService.getChatroomRequests(
+      req.user.userId,
+      query,
+      chatroomId,
+    );
+  }
 
   @Post('create')
   async createRequest(
