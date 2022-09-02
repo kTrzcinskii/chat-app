@@ -9,7 +9,7 @@ export default function useGetAllChatroom(limit?: number) {
     ChatroomsCursor,
     Error | AxiosError<IServerErrorResponse>
   >(
-    ["user-chatroom"],
+    ["user-chatrooms"],
     async ({ pageParam = undefined }) => {
       const res = await getAllChatrooms({ limit, cursor: pageParam });
       return res.data;
@@ -17,6 +17,7 @@ export default function useGetAllChatroom(limit?: number) {
     {
       getNextPageParam: (firstPage) => firstPage.newCursor ?? undefined,
       getPreviousPageParam: (lastPage) => lastPage.newCursor ?? undefined,
+      keepPreviousData: true,
     }
   );
 }
