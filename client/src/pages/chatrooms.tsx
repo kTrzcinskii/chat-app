@@ -1,7 +1,18 @@
 import type { NextPage } from "next";
+import ChatroomsContainer from "../components/chatroom/ChatroomsContainer";
+import CurrentChatroom from "../components/chatroom/CurrentChatroom";
 
 const Chatrooms: NextPage = () => {
-  return <></>;
+  return (
+    <div className='flex flex-row w-screen min-h-screen overflow-x-hidden'>
+      <div className='w-full min-h-full lg:w-[450px] flex'>
+        <ChatroomsContainer />
+      </div>
+      <div className='hidden lg:flex'>
+        <CurrentChatroom />
+      </div>
+    </div>
+  );
 };
 
 export default Chatrooms;
