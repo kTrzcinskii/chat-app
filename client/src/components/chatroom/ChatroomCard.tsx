@@ -5,11 +5,11 @@ import Avatar from "../utils/Avatar";
 
 const ChatroomCard: React.FC<ExtendedChatroom> = ({ name, lastMessage }) => {
   return (
-    <div className='w-full py-7 px-6 flex flex-row justify-between items-end'>
-      <div className='flex flex-row'>
+    <div className='w-full py-7 px-6 flex flex-row justify-between items-end bg-my-dark border-b-2 border-white'>
+      <div className='flex flex-row items-center'>
         <Avatar img_src={chatroom_avatar} />
         <div className='ml-4 flex flex-col'>
-          <h3 className='text-white text-xl'>{name}</h3>
+          <h3 className='text-white text-xl mb-2'>{name}</h3>
           {lastMessage?.content && (
             <p className='text-gray-300'>
               {lastMessage?.username}: {lastMessage?.content}

@@ -23,19 +23,22 @@ const ChatroomsContainer: React.FC = () => {
       <h1 className='w-full text-center text-white mt-10 text-3xl lg:text-4xl mb-10'>
         My chatrooms
       </h1>
-      {data?.pages.map((page, index) => {
-        return (
-          <Fragment key={index}>
-            {page.chatrooms.map((chatroom) => {
-              return (
-                <Fragment key={chatroom.id}>
-                  <ChatroomCard {...chatroom} />
-                </Fragment>
-              );
-            })}
-          </Fragment>
-        );
-      })}
+      <div className='border-t-2 border-white'>
+        {data?.pages.map((page, index) => {
+          return (
+            <Fragment key={index}>
+              {page.chatrooms.map((chatroom) => {
+                return (
+                  <Fragment key={chatroom.id}>
+                    <ChatroomCard {...chatroom} />
+                  </Fragment>
+                );
+              })}
+            </Fragment>
+          );
+        })}
+      </div>
+
       {isFetching && <Spinner centered={!data} />}
       {isError && <ErrorMsg message={error?.message} />}
       <button onClick={() => fetchNextPage()}>fetch</button>
