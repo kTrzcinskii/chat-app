@@ -30,7 +30,15 @@ export class ChatroomsService {
       include: {
         Chatrooms: {
           include: {
-            messages: { take: 1, orderBy: { createdAt: 'desc' } },
+            messages: {
+              take: 1,
+              orderBy: { createdAt: 'desc' },
+              select: {
+                author: { select: { username: true } },
+                content: true,
+                createdAt: true,
+              },
+            },
             users: { select: { username: true, id: true } },
           },
           orderBy: {
@@ -48,8 +56,19 @@ export class ChatroomsService {
     }
 
     const newCursor = user.Chatrooms[limit - 1]?.id;
+    const actualChatrooms = user.Chatrooms.map((chatroom) => {
+      const { messages, ...rest } = chatroom;
+      return {
+        lastMessage: {
+          username: messages[0]?.author.username,
+          content: messages[0]?.content,
+          createdAt: messages[0]?.createdAt,
+        },
+        ...rest,
+      };
+    });
 
-    return { chatrooms: user.Chatrooms, newCursor };
+    return { chatrooms: actualChatrooms, newCursor };
   }
 
   async getChatroom(userId: string, chatroomId: string) {
