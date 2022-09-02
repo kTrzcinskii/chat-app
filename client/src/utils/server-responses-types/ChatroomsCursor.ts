@@ -1,6 +1,6 @@
 import Chatroom from "../interfaces/basic/Chatroom";
 
-interface ExtendedChatroom extends Chatroom {
+export interface ExtendedChatroom extends Chatroom {
   lastMessage?: {
     username: string;
     content: string;
