@@ -2,9 +2,11 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Fragment } from "react";
 import useGetAllChatroom from "../../hooks/query/useGetAllChatrooms";
+import Avatar from "../utils/Avatar";
 import ErrorMsg from "../utils/ErrorMsg";
 import Spinner from "../utils/Spinner";
 import ChatroomCard from "./ChatroomCard";
+import basic_user_avatar from "../../../public/images/basic_user_avatar.png";
 
 const ChatroomsContainer: React.FC = () => {
   const { data, fetchNextPage, isFetching, isError, error } =
@@ -18,17 +20,31 @@ const ChatroomsContainer: React.FC = () => {
     }
   }
 
-  const headerDivHeight = 100;
+  const headerDivHeight = 120;
 
   return (
     <div className='bg-my-dark-light w-full h-full relative'>
       <div
-        className='flex justify-center items-center'
+        className='flex flex-row justify-center items-center space-x-8'
         style={{ height: `${headerDivHeight}px` }}
       >
-        <h1 className='w-full text-center text-white text-3xl lg:text-4xl'>
-          My chatrooms
-        </h1>
+        <Avatar size={80} img_src={basic_user_avatar} />
+        <div className='space-y-3'>
+          {/* TODO: func */}
+          <input
+            type='text'
+            placeholder='Search through your chatrooms...'
+            className='shadow appearance-none rounded w-[300px] py-2 px-3 text-my-dark-dark leading-tight focus:outline-none focus:outline-my-cyan-light focus:outline-offset-0 focus:outline-[3px] placeholder:text-my-dark-dark'
+          />
+          <div className='flex flex-row space-x-5'>
+            <button className='btn my-bg-cyan text-zinc-800 font-semibold min-w-[140px]'>
+              Join
+            </button>
+            <button className='btn my-bg-cyan text-zinc-800 font-semibold min-w-[140px]'>
+              Create
+            </button>
+          </div>
+        </div>
       </div>
       <div
         className='border-t-2 border-white overflow-y-scroll overflow-x-hidden no-scrollbar'
