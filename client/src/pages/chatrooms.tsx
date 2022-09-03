@@ -4,7 +4,7 @@ import CurrentChatroom from "../components/chatroom/CurrentChatroom";
 
 const Chatrooms: NextPage = () => {
   return (
-    <div className='flex flex-row w-screen min-h-screen overflow-x-hidden'>
+    <div className='flex flex-row min-h-screen'>
       <div className='w-full min-h-full lg:w-[450px] flex'>
         <ChatroomsContainer />
       </div>
