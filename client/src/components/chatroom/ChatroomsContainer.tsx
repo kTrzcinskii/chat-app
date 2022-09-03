@@ -8,7 +8,7 @@ import ChatroomCard from "./ChatroomCard";
 
 const ChatroomsContainer: React.FC = () => {
   const { data, fetchNextPage, isFetching, isError, error } =
-    useGetAllChatroom(8);
+    useGetAllChatroom(10);
 
   const router = useRouter();
 
@@ -18,12 +18,22 @@ const ChatroomsContainer: React.FC = () => {
     }
   }
 
+  const headerDivHeight = 100;
+
   return (
     <div className='bg-my-dark-light w-full h-full relative'>
-      <h1 className='w-full text-center text-white mt-10 text-3xl lg:text-4xl mb-10'>
-        My chatrooms
-      </h1>
-      <div className='border-t-2 border-white max-h-screen overflow-y-scroll overflow-x-hidden no-scrollbar'>
+      <div
+        className='flex justify-center items-center'
+        style={{ height: `${headerDivHeight}px` }}
+      >
+        <h1 className='w-full text-center text-white text-3xl lg:text-4xl'>
+          My chatrooms
+        </h1>
+      </div>
+      <div
+        className='border-t-2 border-white overflow-y-scroll overflow-x-hidden no-scrollbar'
+        style={{ height: `calc(100vh - ${headerDivHeight}px)` }}
+      >
         {data?.pages.map((page, index) => {
           return (
             <Fragment key={index}>
