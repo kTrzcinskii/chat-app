@@ -8,7 +8,7 @@ import ChatroomCard from "./ChatroomCard";
 
 const ChatroomsContainer: React.FC = () => {
   const { data, fetchNextPage, isFetching, isError, error } =
-    useGetAllChatroom(1);
+    useGetAllChatroom(8);
 
   const router = useRouter();
 
@@ -23,7 +23,7 @@ const ChatroomsContainer: React.FC = () => {
       <h1 className='w-full text-center text-white mt-10 text-3xl lg:text-4xl mb-10'>
         My chatrooms
       </h1>
-      <div className='border-t-2 border-white'>
+      <div className='border-t-2 border-white max-h-screen overflow-y-scroll overflow-x-hidden no-scrollbar'>
         {data?.pages.map((page, index) => {
           return (
             <Fragment key={index}>
