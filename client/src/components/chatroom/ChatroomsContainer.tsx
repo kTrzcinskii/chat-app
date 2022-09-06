@@ -1,16 +1,27 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import useGetAllChatroom from "../../hooks/query/useGetAllChatrooms";
 import Avatar from "../utils/Avatar";
 import ErrorMsg from "../utils/ErrorMsg";
 import Spinner from "../utils/Spinner";
 import ChatroomCard from "./ChatroomCard";
 import basic_user_avatar from "../../../public/images/basic_user_avatar.png";
+import { useInView } from "react-intersection-observer";
 
 const ChatroomsContainer: React.FC = () => {
+  // TODO: add backend logic to manage searching
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { data, fetchNextPage, isFetching, isError, error } =
-    useGetAllChatroom(10);
+    useGetAllChatroom(8);
+  const { ref: fetcherRef, inView } = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView]);
 
   const router = useRouter();
 
@@ -30,11 +41,12 @@ const ChatroomsContainer: React.FC = () => {
       >
         <Avatar size={80} img_src={basic_user_avatar} />
         <div className='space-y-3'>
-          {/* TODO: func */}
           <input
             type='text'
             placeholder='Search through your chatrooms...'
             className='shadow appearance-none rounded w-[300px] py-2 px-3 text-my-dark-dark leading-tight focus:outline-none focus:outline-my-cyan-light focus:outline-offset-0 focus:outline-[3px] placeholder:text-my-dark-dark'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className='flex flex-row space-x-5'>
             <button className='btn my-bg-cyan text-zinc-800 font-semibold min-w-[140px]'>
@@ -63,11 +75,10 @@ const ChatroomsContainer: React.FC = () => {
             </Fragment>
           );
         })}
+        <div ref={fetcherRef} />
+        {isFetching && <Spinner centered={!data} />}
+        {isError && <ErrorMsg message={error?.message} />}
       </div>
-
-      {isFetching && <Spinner centered={!data} />}
-      {isError && <ErrorMsg message={error?.message} />}
-      <button onClick={() => fetchNextPage()}>fetch</button>
     </div>
   );
 };
