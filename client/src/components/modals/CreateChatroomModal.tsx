@@ -7,6 +7,9 @@ import {
 } from "../../utils/schemas/CreateChatroomSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RadioInput from "../utils/RadioInput";
+import useCreateChatroom from "../../hooks/mutation/useCreateChatroom";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 interface CreateChatroomModalInterface {
   isVisible: boolean;
@@ -26,10 +29,27 @@ const CreateChatroomModal: React.FC<CreateChatroomModalInterface> = ({
     resolver: zodResolver(CreateChatroomSchema),
   });
 
-  console.log(errors);
+  const router = useRouter();
+  const { mutate } = useCreateChatroom();
 
   const onSubmit = (values: ICreateChatroomSchema) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: () => {
+        closeModal();
+      },
+      onError: (e) => {
+        if (axios.isAxiosError(e)) {
+          if (e.response?.status === 403) {
+            setError("name", { message: "Provided name is already in use" });
+          }
+          if (e.response?.status === 401) {
+            router.push("/unauthorized");
+          }
+          return;
+        }
+        throw new Error(e.message);
+      },
+    });
   };
 
   return (
