@@ -14,7 +14,7 @@ const Spinner: React.FC<SpinnerProps> = ({ centered = false }) => {
         centered && centeredClasses
       }`}
     >
-      <ImSpinner5 className='animate-spin' size={60} />
+      <ImSpinner5 className='animate-spin py-4' size={60} />
     </div>
   );
 };
