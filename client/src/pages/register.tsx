@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Link from "next/link";
 import FormContainer from "../components/home/FormContainer";
-import Input from "../components/home/Input";
+import Input from "../components/utils/Input";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
