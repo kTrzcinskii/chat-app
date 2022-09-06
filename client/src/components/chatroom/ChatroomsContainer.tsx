@@ -10,14 +10,17 @@ import basic_user_avatar from "../../../public/images/basic_user_avatar.png";
 import { useInView } from "react-intersection-observer";
 import useManageModal from "../../hooks/useManageModal";
 import CreateChatroomModal from "../modals/CreateChatroomModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ChatroomsContainer: React.FC = () => {
-  // TODO: add backend logic to manage searching
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const { data, fetchNextPage, isFetching, isError, error } =
-    useGetAllChatroom(8);
+  const { data, fetchNextPage, isFetching, isError, error } = useGetAllChatroom(
+    8,
+    searchTerm
+  );
   const { ref: fetcherRef, inView } = useInView();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (inView) {
@@ -59,7 +62,10 @@ const ChatroomsContainer: React.FC = () => {
               placeholder='Search through your chatrooms...'
               className='shadow appearance-none rounded w-[300px] py-2 px-3 text-my-dark-dark leading-tight focus:outline-none focus:outline-my-cyan-light focus:outline-offset-0 focus:outline-[3px] placeholder:text-my-dark-dark'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                queryClient.removeQueries(["user-chatrooms"]);
+              }}
             />
             <div className='flex flex-row space-x-5'>
               <button className='btn my-bg-cyan text-zinc-800 font-semibold min-w-[140px]'>
