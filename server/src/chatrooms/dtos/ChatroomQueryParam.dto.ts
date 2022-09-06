@@ -10,4 +10,8 @@ export class ChatroomQueryParamDto {
   @IsOptional()
   @Type(() => Number)
   limit?: number;
+
+  @IsOptional()
+  @IsNotEmpty()
+  searchTerm?: string;
 }

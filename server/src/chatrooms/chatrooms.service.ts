@@ -24,6 +24,7 @@ export class ChatroomsService {
   async getUserChatrooms(userId: string, query: ChatroomQueryParamDto) {
     const limit = query.limit ?? 10;
     const cursor = query.cursor && { id: query.cursor };
+    const where = query.searchTerm && { name: { contains: query.searchTerm } };
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -45,6 +46,7 @@ export class ChatroomsService {
             updatedAt: 'desc',
           },
           cursor,
+          where,
           skip: query.cursor ? 1 : 0,
           take: limit,
         },
