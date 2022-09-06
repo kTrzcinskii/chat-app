@@ -33,9 +33,16 @@ const Input: React.FC<InputProps> = ({
   const primaryText = lightMode ? "text-zinc-600" : "text-white";
   const primaryBorder = lightMode ? "border-zinc-600" : "border-white";
 
+  const secondaryTextFocused = lightMode
+    ? "focus-within:text-my-blue-dark"
+    : "focus-within:text-my-cyan-light";
+  const secondaryBorderFocused = lightMode
+    ? "focus-within:border-my-blue-dark"
+    : "focus-within:border-my-cyan-light";
+
   return (
     <div
-      className={`space-y-2 ${primaryText} focus-within:text-my-cyan-light ${
+      className={`space-y-2 ${primaryText} ${secondaryTextFocused} ${
         isError && "!text-red-400"
       }`}
     >
@@ -46,7 +53,7 @@ const Input: React.FC<InputProps> = ({
         <input
           id={id}
           {...props}
-          className={`bg-inherit appearance-none border-2 ${primaryBorder} focus:border-my-cyan-light rounded-lg w-full py-2 px-3 ${primaryText} leading-tight focus:outline-none transition-all duration-100 ease-in-out ${
+          className={`bg-inherit appearance-none border-2 ${primaryBorder} ${secondaryBorderFocused} rounded-lg w-full py-2 px-3 ${primaryText} leading-tight focus:outline-none transition-all duration-100 ease-in-out ${
             isError && "!border-red-400"
           }`}
           {...register(registerName)}
