@@ -13,6 +13,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   register: UseFormRegister<any>;
   registerName: string;
   errors: FieldErrorsImpl<any>;
+  lightMode?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -23,14 +24,18 @@ const Input: React.FC<InputProps> = ({
   icon,
   id,
   label,
+  lightMode = false,
   ...props
 }) => {
   const isError = errors[registerName] ? true : false;
   const errorMessage = String(errors[registerName]?.message) ?? "Error";
 
+  const primaryText = lightMode ? "text-zinc-600" : "text-white";
+  const primaryBorder = lightMode ? "border-zinc-600" : "border-white";
+
   return (
     <div
-      className={`space-y-2 text-white focus-within:text-my-cyan-light ${
+      className={`space-y-2 ${primaryText} focus-within:text-my-cyan-light ${
         isError && "!text-red-400"
       }`}
     >
@@ -41,7 +46,7 @@ const Input: React.FC<InputProps> = ({
         <input
           id={id}
           {...props}
-          className={`bg-inherit appearance-none border-2 border-white focus:border-my-cyan-light rounded-lg w-full py-2 px-3 text-white leading-tight focus:outline-none transition-all duration-100 ease-in-out ${
+          className={`bg-inherit appearance-none border-2 ${primaryBorder} focus:border-my-cyan-light rounded-lg w-full py-2 px-3 ${primaryText} leading-tight focus:outline-none transition-all duration-100 ease-in-out ${
             isError && "!border-red-400"
           }`}
           {...register(registerName)}
