@@ -14,6 +14,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   registerName: string;
   errors: FieldErrorsImpl<any>;
   lightMode?: boolean;
+  darkerBlue?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -25,6 +26,7 @@ const Input: React.FC<InputProps> = ({
   id,
   label,
   lightMode = false,
+  darkerBlue = false,
   ...props
 }) => {
   const isError = errors[registerName] ? true : false;
@@ -33,12 +35,14 @@ const Input: React.FC<InputProps> = ({
   const primaryText = lightMode ? "text-zinc-600" : "text-white";
   const primaryBorder = lightMode ? "border-zinc-600" : "border-white";
 
-  const secondaryTextFocused = lightMode
-    ? "focus-within:text-my-blue-dark"
-    : "focus-within:text-my-cyan-light";
-  const secondaryBorderFocused = lightMode
-    ? "focus-within:border-my-blue-dark"
-    : "focus-within:border-my-cyan-light";
+  const secondaryTextFocused =
+    lightMode || darkerBlue
+      ? "focus-within:text-my-blue-dark"
+      : "focus-within:text-my-cyan-light";
+  const secondaryBorderFocused =
+    lightMode || darkerBlue
+      ? "focus-within:border-my-blue-dark"
+      : "focus-within:border-my-cyan-light";
 
   return (
     <div

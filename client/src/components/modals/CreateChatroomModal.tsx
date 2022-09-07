@@ -67,12 +67,10 @@ const CreateChatroomModal: React.FC<CreateChatroomModalInterface> = ({
               register={register}
               registerName='name'
               errors={errors}
-              lightMode
+              darkerBlue
             />
             <div>
-              <h3 className='text-lg ml-1 text-zinc-600 mb-2'>
-                Choose privacy:
-              </h3>
+              <h3 className='text-lg ml-1 text-white mb-2'>Choose privacy:</h3>
               <div className='flex w-full justify-around'>
                 <RadioInput
                   label='Public'
