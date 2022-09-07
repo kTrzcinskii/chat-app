@@ -1,3 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import useGetChatroomsByName from "../../hooks/query/useGetChatroomsByName";
 import ModalWrapper from "./ModalWrapper";
 
 interface JoinChatroomModalProps {
@@ -9,6 +12,12 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   isVisible,
   closeModal,
 }) => {
+  const [inputValue, setInputValue] = useState("");
+  const { data, refetch } = useGetChatroomsByName(inputValue);
+  const queryClient = useQueryClient();
+
+  console.log(data);
+
   return (
     <ModalWrapper closeModal={closeModal} isVisible={isVisible}>
       <div>
@@ -18,9 +27,20 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
         <div className='flex flex-row space-x-2 justify-center'>
           <input
             type='text'
-            className='bg-inherit shadow appearance-none rounded w-[250px] py-2 px-3 text-my-dark-dark leading-tight border-2 border-white focus:border-my-blue-dark focus:outline-none focus:outline-my-blue-dark focus:outline-offset-0 focus:outline-[1px] placeholder:text-my-dark-dark'
+            className='text-white bg-inherit shadow appearance-none rounded w-[250px] py-2 px-3 leading-tight border-2 border-white focus:border-my-blue-dark focus:outline-none focus:outline-my-blue-dark focus:outline-offset-0 focus:outline-[1px] placeholder:text-gray-300'
+            value={inputValue}
+            onChange={(e) => setInputValue(e.currentTarget.value)}
+            placeholder='Enter name...'
           />
-          <button className='btn my-bg-blue'>Search</button>
+          <button
+            className='btn my-bg-blue'
+            onClick={() => {
+              queryClient.removeQueries(["chatrooms-by-name"]);
+              refetch();
+            }}
+          >
+            Search
+          </button>
         </div>
       </div>
     </ModalWrapper>
