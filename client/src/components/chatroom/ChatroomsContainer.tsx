@@ -52,7 +52,7 @@ const ChatroomsContainer: React.FC = () => {
       />
       <div className='bg-my-dark-light w-full h-full relative'>
         <div
-          className='flex flex-row justify-center items-center space-x-8'
+          className='flex flex-row justify-center items-center space-x-3 md:space-x-8'
           style={{ height: `${headerDivHeight}px` }}
         >
           <Avatar size={80} img_src={basic_user_avatar} />
