@@ -38,8 +38,11 @@ export class ChatroomsController {
   }
 
   @Get('search')
-  async searchChatrooms(@Query() query: SearchChatroomQueryParamDto) {
-    return this.chatroomsService.searchChatrooms(query);
+  async searchChatrooms(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: SearchChatroomQueryParamDto,
+  ) {
+    return this.chatroomsService.searchChatrooms(query, req.user.userId);
   }
 
   @Post('create')

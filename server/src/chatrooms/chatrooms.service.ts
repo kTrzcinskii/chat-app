@@ -93,12 +93,15 @@ export class ChatroomsService {
     return { chatroom };
   }
 
-  async searchChatrooms(query: SearchChatroomQueryParamDto) {
+  async searchChatrooms(query: SearchChatroomQueryParamDto, userId: string) {
     const limit = query.limit ?? 10;
     const cursor = query.cursor && { id: query.cursor };
 
     const chatrooms = await this.prisma.chatroom.findMany({
-      where: { name: { contains: query.name } },
+      where: {
+        name: { contains: query.name },
+        users: { none: { id: userId } },
+      },
       cursor,
       skip: query.cursor ? 1 : 0,
       take: limit,
