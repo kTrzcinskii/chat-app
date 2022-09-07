@@ -11,6 +11,7 @@ import { useInView } from "react-intersection-observer";
 import useManageModal from "../../hooks/useManageModal";
 import CreateChatroomModal from "../modals/CreateChatroomModal";
 import { useQueryClient } from "@tanstack/react-query";
+import JoinChatroomModal from "../modals/JoinChatroomModal";
 
 const ChatroomsContainer: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -42,6 +43,12 @@ const ChatroomsContainer: React.FC = () => {
     closeModal: closeModalCreate,
   } = useManageModal();
 
+  const {
+    isVisible: isVisibleJoin,
+    openModal: openModalJoin,
+    closeModal: closeModalJoin,
+  } = useManageModal();
+
   const headerDivHeight = 120;
 
   return (
@@ -49,6 +56,10 @@ const ChatroomsContainer: React.FC = () => {
       <CreateChatroomModal
         isVisible={isVisibleCreate}
         closeModal={closeModalCreate}
+      />
+      <JoinChatroomModal
+        closeModal={closeModalJoin}
+        isVisible={isVisibleJoin}
       />
       <div className='bg-my-dark-light w-full h-full relative'>
         <div
@@ -68,7 +79,10 @@ const ChatroomsContainer: React.FC = () => {
               }}
             />
             <div className='flex flex-row space-x-5'>
-              <button className='btn my-bg-cyan text-zinc-800 font-semibold min-w-[140px]'>
+              <button
+                className='btn my-bg-cyan text-zinc-800 font-semibold min-w-[140px]'
+                onClick={openModalJoin}
+              >
                 Join
               </button>
               <button
