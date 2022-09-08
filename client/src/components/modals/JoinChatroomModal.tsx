@@ -14,12 +14,17 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   closeModal,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const [isError, setIsError] = useState(false);
   const { data, refetch } = useGetChatroomsByName(inputValue, 15);
   const queryClient = useQueryClient();
 
   console.log(data);
 
-  //todo: message when no chatroom found && when input === ""
+  //todo: message when no chatroom found
+  //todo: fetch next when scroll to bottom
+  const errorClasses = "!border-red-500 focus:outline-red-500";
+  console.log(isError);
+
   return (
     <ModalWrapper closeModal={closeModal} isVisible={isVisible}>
       <div>
@@ -27,16 +32,30 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
           Search for chatrooms:
         </h1>
         <div className='flex flex-row space-x-2 justify-center'>
-          <input
-            type='text'
-            className='text-white bg-inherit shadow appearance-none rounded w-[250px] py-2 px-3 leading-tight border-2 border-white focus:border-my-blue-dark focus:outline-none focus:outline-my-blue-dark focus:outline-offset-0 focus:outline-[1px] placeholder:text-gray-300'
-            value={inputValue}
-            onChange={(e) => setInputValue(e.currentTarget.value)}
-            placeholder='Enter name...'
-          />
+          <div>
+            <input
+              type='text'
+              className={`text-white bg-inherit shadow appearance-none rounded w-[250px] py-2 px-3 leading-tight border-2 border-white focus:border-my-blue-dark focus:outline-none focus:outline-my-blue-dark focus:outline-offset-0 focus:outline-[1px] placeholder:text-gray-300 ${
+                isError && errorClasses
+              }`}
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.currentTarget.value);
+                setIsError(false);
+              }}
+              placeholder='Enter name...'
+            />
+            {isError && (
+              <p className='text-sm ml-1 text-red-500'>Name is required</p>
+            )}
+          </div>
           <button
-            className='btn my-bg-blue'
+            className='btn my-bg-blue h-[40px]'
             onClick={() => {
+              if (inputValue === "") {
+                setIsError(true);
+                return;
+              }
               queryClient.removeQueries(["chatrooms-by-name"]);
               refetch();
             }}
@@ -44,7 +63,7 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
             Search
           </button>
         </div>
-        <div className='flex flex-col items-center justify-center space-y-3 pt-4'>
+        <div className='flex flex-col items-center justify-center space-y-4 pt-4'>
           {data?.pages.map((page, index) => {
             return (
               <Fragment key={index}>
