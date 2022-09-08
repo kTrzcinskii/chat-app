@@ -1,5 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
+import { useInView } from "react-intersection-observer";
 import useGetChatroomsByName from "../../hooks/query/useGetChatroomsByName";
 import SearchedChatroomCard from "../chatroom/SearchedChatroomCard";
 import ErrorMsg from "../utils/ErrorMsg";
@@ -16,6 +18,7 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   closeModal,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isCleared, setIsCleared] = useState(false);
   const [isError, setIsError] = useState(false);
   const {
@@ -25,12 +28,20 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
     isError: isApiError,
     error,
     isSuccess,
-  } = useGetChatroomsByName(inputValue, 15);
+    fetchNextPage,
+    hasNextPage,
+  } = useGetChatroomsByName(searchTerm, 15);
   const queryClient = useQueryClient();
 
   console.log(data);
 
-  //todo: fetch next when scroll to bottom
+  const { ref: fetcherRef, inView } = useInView();
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView, hasNextPage]);
+
   const errorClasses = "!border-red-500 focus:outline-red-500";
 
   return (
@@ -50,8 +61,9 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
               onChange={(e) => {
                 if (isError) {
                   setIsError(false);
-                  queryClient.removeQueries(["chatrooms-by-name"]);
                 }
+                setIsCleared(true);
+                queryClient.removeQueries(["chatrooms-by-name"]);
                 setInputValue(e.currentTarget.value);
               }}
               placeholder='Enter name...'
@@ -68,6 +80,9 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
                 return;
               }
               setIsCleared(false);
+              flushSync(() => {
+                setSearchTerm(inputValue);
+              });
               queryClient.removeQueries(["chatrooms-by-name"]);
               refetch();
             }}
@@ -89,9 +104,14 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
               </Fragment>
             );
           })}
+          <div ref={fetcherRef} />
         </div>
         {isFetching && <Spinner />}
-        {isApiError && <ErrorMsg message={error.message} />}
+        {isApiError && (
+          <div className='relative py-10'>
+            <ErrorMsg message={error.message} />
+          </div>
+        )}
         {isSuccess &&
           inputValue !== "" &&
           data.pages[0]?.chatrooms.length === 0 &&
