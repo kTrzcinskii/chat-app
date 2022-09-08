@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import useGetChatroomsByName from "../../hooks/query/useGetChatroomsByName";
+import SearchedChatroomCard from "../chatroom/SearchedChatroomCard";
 import ModalWrapper from "./ModalWrapper";
 
 interface JoinChatroomModalProps {
@@ -13,11 +14,12 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   closeModal,
 }) => {
   const [inputValue, setInputValue] = useState("");
-  const { data, refetch } = useGetChatroomsByName(inputValue);
+  const { data, refetch } = useGetChatroomsByName(inputValue, 15);
   const queryClient = useQueryClient();
 
   console.log(data);
 
+  //todo: message when no chatroom found && when input === ""
   return (
     <ModalWrapper closeModal={closeModal} isVisible={isVisible}>
       <div>
@@ -41,6 +43,21 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
           >
             Search
           </button>
+        </div>
+        <div className='flex flex-col items-center justify-center space-y-3 pt-4'>
+          {data?.pages.map((page, index) => {
+            return (
+              <Fragment key={index}>
+                {page.chatrooms.map((chatroom) => {
+                  return (
+                    <Fragment key={chatroom.id}>
+                      <SearchedChatroomCard {...chatroom} />
+                    </Fragment>
+                  );
+                })}
+              </Fragment>
+            );
+          })}
         </div>
       </div>
     </ModalWrapper>
