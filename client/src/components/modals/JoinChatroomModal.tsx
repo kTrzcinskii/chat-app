@@ -2,6 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Fragment, useState } from "react";
 import useGetChatroomsByName from "../../hooks/query/useGetChatroomsByName";
 import SearchedChatroomCard from "../chatroom/SearchedChatroomCard";
+import ErrorMsg from "../utils/ErrorMsg";
+import Spinner from "../utils/Spinner";
 import ModalWrapper from "./ModalWrapper";
 
 interface JoinChatroomModalProps {
@@ -14,16 +16,22 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   closeModal,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const [isCleared, setIsCleared] = useState(false);
   const [isError, setIsError] = useState(false);
-  const { data, refetch } = useGetChatroomsByName(inputValue, 15);
+  const {
+    data,
+    refetch,
+    isFetching,
+    isError: isApiError,
+    error,
+    isSuccess,
+  } = useGetChatroomsByName(inputValue, 15);
   const queryClient = useQueryClient();
 
   console.log(data);
 
-  //todo: message when no chatroom found
   //todo: fetch next when scroll to bottom
   const errorClasses = "!border-red-500 focus:outline-red-500";
-  console.log(isError);
 
   return (
     <ModalWrapper closeModal={closeModal} isVisible={isVisible}>
@@ -40,8 +48,11 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
               }`}
               value={inputValue}
               onChange={(e) => {
+                if (isError) {
+                  setIsError(false);
+                  queryClient.removeQueries(["chatrooms-by-name"]);
+                }
                 setInputValue(e.currentTarget.value);
-                setIsError(false);
               }}
               placeholder='Enter name...'
             />
@@ -56,6 +67,7 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
                 setIsError(true);
                 return;
               }
+              setIsCleared(false);
               queryClient.removeQueries(["chatrooms-by-name"]);
               refetch();
             }}
@@ -78,6 +90,27 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
             );
           })}
         </div>
+        {isFetching && <Spinner />}
+        {isApiError && <ErrorMsg message={error.message} />}
+        {isSuccess &&
+          inputValue !== "" &&
+          data.pages[0]?.chatrooms.length === 0 &&
+          !isCleared && (
+            <div className='w-full flex flex-col justify-center items-center space-y-2'>
+              <p className='text-center text-my-blue-light text-lg'>
+                There is no chatroom with provided name.
+              </p>
+              <button
+                className='appearance-none text-red-500 text-lg hover:underline'
+                onClick={() => {
+                  setIsCleared(true);
+                  setInputValue("");
+                }}
+              >
+                Clear input
+              </button>
+            </div>
+          )}
       </div>
     </ModalWrapper>
   );
