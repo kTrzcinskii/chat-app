@@ -109,7 +109,24 @@ export class ChatroomsService {
 
     const newCursor = chatrooms[limit - 1]?.id;
 
-    return { chatrooms, newCursor };
+    const finalChatrooms = await Promise.all(
+      chatrooms.map(async (chatroom) => {
+        const inivtation = await this.prisma.invitation.findFirst({
+          where: { chatroomId: chatroom.id, invitedUserId: userId },
+        });
+        const request = await this.prisma.request.findFirst({
+          where: { chatroomId: chatroom.id, requestedById: userId },
+        });
+        const status = request
+          ? 'REQUESTED'
+          : inivtation
+          ? 'INVITED'
+          : 'NO-STATUS';
+        return { ...chatroom, status };
+      }),
+    );
+
+    return { chatrooms: finalChatrooms, newCursor };
   }
 
   async createChatroom(dto: CreateChatroomDto, authorId: string) {
