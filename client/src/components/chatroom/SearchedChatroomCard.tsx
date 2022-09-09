@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import useJoinChatroom from "../../hooks/mutation/useJoinChatroom";
 import axios from "axios";
 import { useRouter } from "next/router";
+import useAcceptInvitation from "../../hooks/mutation/useAcceptInvitation";
 
 interface TextWithSpanProps {
   name: string;
@@ -58,6 +59,20 @@ const SearchedChatroomCard: React.FC<
         );
         break;
       case "Accept Invitation":
+        acceptInvitationMutate(
+          { invitationId: invitation!.id },
+          {
+            onError: (e) => {
+              if (axios.isAxiosError(e) && e.response?.status === 401) {
+                router.push("/unauthorized");
+              }
+              throw new Error(e.message);
+            },
+            onSuccess: () => {
+              refetch();
+            },
+          }
+        );
         break;
       case "Send Request":
         break;
@@ -67,6 +82,7 @@ const SearchedChatroomCard: React.FC<
   };
 
   const { mutate: joinChatroomMutate } = useJoinChatroom();
+  const { mutate: acceptInvitationMutate } = useAcceptInvitation();
 
   //todo: add functionality to all the buttons in this component
   return (
