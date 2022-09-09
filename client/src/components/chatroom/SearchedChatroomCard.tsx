@@ -1,11 +1,13 @@
 import getButtonText from "../../utils/helpers/getButtonText";
 import { ChatroomWithStatus } from "../../utils/server-responses-types/ChatroomByName";
 import Avatar from "../utils/Avatar";
-
 import default_group_img from "../../../public/images/basic_chatroom_avatar.png";
 import getShortMessage from "../../utils/helpers/getShortMessage";
 import { useState } from "react";
 import { format } from "date-fns";
+import useJoinChatroom from "../../hooks/mutation/useJoinChatroom";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 interface TextWithSpanProps {
   name: string;
@@ -20,16 +22,51 @@ const TextWithSpan: React.FC<TextWithSpanProps> = ({ name, value }) => {
   );
 };
 
-const SearchedChatroomCard: React.FC<ChatroomWithStatus> = ({
+const SearchedChatroomCard: React.FC<
+  ChatroomWithStatus & { refetch: () => void }
+> = ({
   name,
   status,
   privacyMode,
   createdAt,
   invitation,
   request,
+  id,
+  refetch,
 }) => {
   const btnText = getButtonText(status, privacyMode);
   const [showMore, setShowMore] = useState(false);
+
+  const router = useRouter();
+
+  const btnOnClick = () => {
+    switch (btnText) {
+      case "Join Chatroom":
+        joinChatroomMutate(
+          { chatroomId: id },
+          {
+            onError: (e) => {
+              if (axios.isAxiosError(e) && e.response?.status === 401) {
+                router.push("/unauthorized");
+              }
+              throw new Error(e.message);
+            },
+            onSuccess: () => {
+              refetch();
+            },
+          }
+        );
+        break;
+      case "Accept Invitation":
+        break;
+      case "Send Request":
+        break;
+      default:
+        break;
+    }
+  };
+
+  const { mutate: joinChatroomMutate } = useJoinChatroom();
 
   //todo: add functionality to all the buttons in this component
   return (
@@ -50,7 +87,7 @@ const SearchedChatroomCard: React.FC<ChatroomWithStatus> = ({
         <button
           className='btn text-center text-my-blue-dark bg-white disabled:bg-gray-300 hover:bg-gray-200 active:bg-gray-300 min-w-[146px]'
           disabled={btnText === "Request Sent"}
-          onClick={() => console.log("button clicked")}
+          onClick={btnOnClick}
         >
           {btnText}
         </button>

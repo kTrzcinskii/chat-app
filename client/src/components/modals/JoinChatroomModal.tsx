@@ -33,8 +33,6 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   } = useGetChatroomsByName(searchTerm, 15);
   const queryClient = useQueryClient();
 
-  console.log(data);
-
   const { ref: fetcherRef, inView } = useInView();
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -97,7 +95,7 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
                 {page.chatrooms.map((chatroom) => {
                   return (
                     <Fragment key={chatroom.id}>
-                      <SearchedChatroomCard {...chatroom} />
+                      <SearchedChatroomCard {...chatroom} refetch={refetch} />
                     </Fragment>
                   );
                 })}
