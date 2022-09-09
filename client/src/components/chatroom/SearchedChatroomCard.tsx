@@ -10,6 +10,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import useAcceptInvitation from "../../hooks/mutation/useAcceptInvitation";
 import useSendRequest from "../../hooks/mutation/useSendRequest";
+import useDeleteRequest from "../../hooks/mutation/useDeleteRequest";
 
 interface TextWithSpanProps {
   name: string;
@@ -99,6 +100,7 @@ const SearchedChatroomCard: React.FC<
   const { mutate: joinChatroomMutate } = useJoinChatroom();
   const { mutate: acceptInvitationMutate } = useAcceptInvitation();
   const { mutate: sendRequestMutate } = useSendRequest();
+  const { mutate: deleteRequestMutate } = useDeleteRequest();
 
   //todo: add functionality to all the buttons in this component
   return (
@@ -155,7 +157,28 @@ const SearchedChatroomCard: React.FC<
                 value={format(new Date(request.createdAt), "dd.MM.yyyy")}
               />
               <div className='w-full flex justify-center items-center'>
-                <button className='btn bg-red-500 hover:bg-red-600 active:bg-red-700 mt-2'>
+                <button
+                  className='btn bg-red-500 hover:bg-red-600 active:bg-red-700 mt-2'
+                  onClick={() => {
+                    deleteRequestMutate(
+                      { requestId: request.id },
+                      {
+                        onError: (e) => {
+                          if (
+                            axios.isAxiosError(e) &&
+                            e.response?.status === 401
+                          ) {
+                            router.push("/unauthorized");
+                          }
+                          throw new Error(e.message);
+                        },
+                        onSuccess: () => {
+                          refetch();
+                        },
+                      }
+                    );
+                  }}
+                >
                   Cancel Request
                 </button>
               </div>
