@@ -12,6 +12,7 @@ import useAcceptInvitation from "../../hooks/mutation/useAcceptInvitation";
 import useSendRequest from "../../hooks/mutation/useSendRequest";
 import useDeleteRequest from "../../hooks/mutation/useDeleteRequest";
 import Spinner from "../utils/Spinner";
+import useDeleteInvitation from "../../hooks/mutation/useDeleteInvitation";
 
 interface TextWithSpanProps {
   name: string;
@@ -115,15 +116,19 @@ const SearchedChatroomCard: React.FC<
     useSendRequest();
   const { mutate: deleteRequestMutate, isLoading: isLoadingDeleteRequest } =
     useDeleteRequest();
+  const {
+    mutate: deleteInvitationMutate,
+    isLoading: isLoadingDeleteInvitation,
+  } = useDeleteInvitation();
 
   const isAnyLoading =
     isLoadingAccept ||
     isLoadingDeleteRequest ||
     isLoadingJoin ||
     isLoadingSend ||
+    isLoadingDeleteInvitation ||
     (isLoading && lastClickedId === id);
 
-  //todo: add functionality to all the buttons in this component
   return (
     <div className='bg-my-blue-dark w-[350px] px-3 py-2 rounded-lg relative'>
       {isAnyLoading && (
@@ -174,7 +179,28 @@ const SearchedChatroomCard: React.FC<
                   value={format(new Date(invitation.createdAt), "dd.MM.yyyy")}
                 />
                 <div className='w-full flex justify-center items-center'>
-                  <button className='btn bg-red-500 hover:bg-red-600 active:bg-red-700 mt-2'>
+                  <button
+                    className='btn bg-red-500 hover:bg-red-600 active:bg-red-700 mt-2'
+                    onClick={() => {
+                      deleteInvitationMutate(
+                        { invitationId: invitation.id },
+                        {
+                          onError: (e) => {
+                            if (
+                              axios.isAxiosError(e) &&
+                              e.response?.status === 401
+                            ) {
+                              router.push("/unauthorized");
+                            }
+                            throw new Error(e.message);
+                          },
+                          onSuccess: () => {
+                            refetch();
+                          },
+                        }
+                      );
+                    }}
+                  >
                     Delete Invitation
                   </button>
                 </div>
