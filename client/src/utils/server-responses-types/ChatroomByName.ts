@@ -1,5 +1,6 @@
 import Chatroom from "../interfaces/basic/Chatroom";
 import Invitation from "../interfaces/basic/Invitation";
+import Request from "../interfaces/basic/Request";
 
 interface InvitationWithInvitedByUsername extends Invitation {
   invitedBy: { username: string };
