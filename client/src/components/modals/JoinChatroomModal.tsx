@@ -17,6 +17,7 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
   isVisible,
   closeModal,
 }) => {
+  const [lastClickedId, setLastClickedId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isCleared, setIsCleared] = useState(false);
@@ -95,7 +96,13 @@ const JoinChatroomModal: React.FC<JoinChatroomModalProps> = ({
                 {page.chatrooms.map((chatroom) => {
                   return (
                     <Fragment key={chatroom.id}>
-                      <SearchedChatroomCard {...chatroom} refetch={refetch} />
+                      <SearchedChatroomCard
+                        {...chatroom}
+                        refetch={refetch}
+                        isLoading={isFetching}
+                        lastClickedId={lastClickedId}
+                        setLastClickedId={setLastClickedId}
+                      />
                     </Fragment>
                   );
                 })}
