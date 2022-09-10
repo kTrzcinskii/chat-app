@@ -108,7 +108,7 @@ const ChatroomsContainer: React.FC<ChatroomsContainerProps> = ({
           </div>
         </div>
         <div
-          className='border-t-2 border-white overflow-y-scroll overflow-x-hidden no-scrollbar'
+          className='overflow-y-scroll overflow-x-hidden no-scrollbar'
           style={{ height: `calc(100vh - ${headerDivHeight}px)` }}
         >
           {data?.pages.map((page, index) => {
