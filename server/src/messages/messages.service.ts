@@ -27,6 +27,11 @@ export class MessagesService {
           cursor,
           skip: query.cursor ? 1 : 0,
           take: limit,
+          include: {
+            author: {
+              select: { username: true },
+            },
+          },
         },
         users: { select: { id: true } },
       },
