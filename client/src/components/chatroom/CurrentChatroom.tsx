@@ -9,6 +9,7 @@ interface CurrentChatroomProps {
 
 const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
   console.log(chatroomInfo);
+  const MESSAGE_INPUT_HEIGHT = 65;
   return (
     <div className='w-full min-h-full flex flex-row'>
       <div className='h-full w-full flex flex-col'>
@@ -25,8 +26,11 @@ const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
           className='relative w-full'
           style={{ height: "calc(100% - 122px)" }}
         >
-          <MessagesContainer />
-          <MessageInput />
+          <MessagesContainer inputHeight={MESSAGE_INPUT_HEIGHT} />
+          <MessageInput
+            inputHeight={MESSAGE_INPUT_HEIGHT}
+            chatroomId={chatroomInfo!.id}
+          />
         </div>
       </div>
       <div className='hidden xl:flex flex-col h-full xl:w-[400px] bg-my-dark-very-dark'>
