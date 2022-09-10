@@ -21,7 +21,7 @@ const ChatroomCard: React.FC<
 }) => {
   return (
     <div
-      className='w-full py-7 px-6 flex flex-row justify-between items-end bg-my-dark cursor-pointer hover:bg-my-dark-dark transition-all duration-200 ease-in-out'
+      className='w-full py-7 px-6 flex flex-row justify-between items-end bg-my-dark-light cursor-pointer hover:bg-my-dark transition-all duration-200 ease-in-out'
       onClick={() =>
         setCurrentChatroomInfo({
           createdAt,

@@ -74,7 +74,7 @@ const ChatroomsContainer: React.FC<ChatroomsContainerProps> = ({
         closeModal={closeModalJoin}
         isVisible={isVisibleJoin}
       />
-      <div className='bg-my-dark-light w-full h-full relative'>
+      <div className='w-full h-full relative bg-my-dark-light'>
         <div
           className='flex flex-row justify-center items-center space-x-3 md:space-x-8'
           style={{ height: `${headerDivHeight}px` }}
