@@ -2,14 +2,19 @@ import { ExtendedChatroom } from "../../utils/server-responses-types/ChatroomsCu
 import { BsThreeDots } from "react-icons/bs";
 import MessagesContainer from "./MessagesContainer";
 import MessageInput from "./MessageInput";
+import Spinner from "../utils/Spinner";
 
 interface CurrentChatroomProps {
   chatroomInfo: ExtendedChatroom | null;
 }
 
 const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
-  console.log(chatroomInfo);
   const MESSAGE_INPUT_HEIGHT = 65;
+
+  if (chatroomInfo === null) {
+    return <Spinner centered />;
+  }
+
   return (
     <div className='w-full min-h-full flex flex-row'>
       <div className='h-full w-full flex flex-col'>
@@ -26,10 +31,13 @@ const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
           className='relative w-full'
           style={{ height: "calc(100% - 122px)" }}
         >
-          <MessagesContainer inputHeight={MESSAGE_INPUT_HEIGHT} />
+          <MessagesContainer
+            inputHeight={MESSAGE_INPUT_HEIGHT}
+            chatroomId={chatroomInfo.id}
+          />
           <MessageInput
             inputHeight={MESSAGE_INPUT_HEIGHT}
-            chatroomId={chatroomInfo!.id}
+            chatroomId={chatroomInfo.id}
           />
         </div>
       </div>
