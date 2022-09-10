@@ -35,6 +35,8 @@ module.exports = {
           light: "#5d5b5e",
           DEFAULT: "#4b494c",
           dark: "#444244",
+          "very-dark": "#2d2c2e",
+          "very-very-dark": "#1e1d1e",
         },
       },
       fontFamily: {

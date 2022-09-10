@@ -12,7 +12,7 @@ const Chatrooms: NextPage = () => {
       <div className='w-full min-h-full lg:w-[450px] flex'>
         <ChatroomsContainer setCurrentChatroomInfo={setCurrentChatroomInfo} />
       </div>
-      <div className='hidden lg:flex'>
+      <div className='hidden lg:flex lg:w-[calc(100vw-450px)]'>
         <CurrentChatroom chatroomInfo={currentChatroomInfo} />
       </div>
     </div>
