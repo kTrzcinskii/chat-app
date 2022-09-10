@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useState } from "react";
+import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
 import useGetAllChatroom from "../../hooks/query/useGetAllChatrooms";
 import Avatar from "../utils/Avatar";
 import ErrorMsg from "../utils/ErrorMsg";
@@ -12,14 +12,20 @@ import useManageModal from "../../hooks/useManageModal";
 import CreateChatroomModal from "../modals/CreateChatroomModal";
 import { useQueryClient } from "@tanstack/react-query";
 import JoinChatroomModal from "../modals/JoinChatroomModal";
+import { ExtendedChatroom } from "../../utils/server-responses-types/ChatroomsCursor";
 
-const ChatroomsContainer: React.FC = () => {
+interface ChatroomsContainerProps {
+  setCurrentChatroomInfo: Dispatch<SetStateAction<ExtendedChatroom | null>>;
+}
+
+const ChatroomsContainer: React.FC<ChatroomsContainerProps> = ({
+  setCurrentChatroomInfo,
+}) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [firstFetch, setFirstFetch] = useState(true);
 
-  const { data, fetchNextPage, isFetching, isError, error } = useGetAllChatroom(
-    8,
-    searchTerm
-  );
+  const { data, fetchNextPage, isFetching, isError, error, isSuccess } =
+    useGetAllChatroom(8, searchTerm);
   const { ref: fetcherRef, inView } = useInView();
   const queryClient = useQueryClient();
 
@@ -50,6 +56,13 @@ const ChatroomsContainer: React.FC = () => {
   } = useManageModal();
 
   const headerDivHeight = 120;
+
+  useEffect(() => {
+    if (firstFetch && isSuccess) {
+      setCurrentChatroomInfo(data?.pages[0]?.chatrooms[0] ?? null);
+      setFirstFetch(false);
+    }
+  }, [data, setCurrentChatroomInfo, firstFetch, isSuccess]);
 
   return (
     <>
@@ -104,7 +117,10 @@ const ChatroomsContainer: React.FC = () => {
                 {page.chatrooms.map((chatroom) => {
                   return (
                     <Fragment key={chatroom.id}>
-                      <ChatroomCard {...chatroom} />
+                      <ChatroomCard
+                        {...chatroom}
+                        setCurrentChatroomInfo={setCurrentChatroomInfo}
+                      />
                     </Fragment>
                   );
                 })}
