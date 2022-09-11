@@ -1,7 +1,7 @@
 import { ExtendedChatroom } from "../../utils/server-responses-types/ChatroomsCursor";
 import { BsThreeDots } from "react-icons/bs";
-import MessagesContainer from "./MessagesContainer";
-import MessageInput from "./MessageInput";
+import MessagesContainer from "../message/MessagesContainer";
+import MessageInput from "../message/MessageInput";
 import Spinner from "../utils/Spinner";
 
 interface CurrentChatroomProps {

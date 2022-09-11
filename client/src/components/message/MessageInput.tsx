@@ -1,4 +1,3 @@
-import { FiSend } from "react-icons/fi";
 import { RiSendPlaneFill } from "react-icons/ri";
 
 interface MessageInputProps {
