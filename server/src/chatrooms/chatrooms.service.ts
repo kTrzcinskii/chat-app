@@ -24,41 +24,35 @@ export class ChatroomsService {
   async getUserChatrooms(userId: string, query: ChatroomQueryParamDto) {
     const limit = query.limit ?? 10;
     const cursor = query.cursor && { id: query.cursor };
-    const where = query.searchTerm && { name: { contains: query.searchTerm } };
+    const where = query.searchTerm
+      ? {
+          name: { contains: query.searchTerm },
+          users: { some: { id: userId } },
+        }
+      : { users: { some: { id: userId } } };
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    const chatrooms = await this.prisma.chatroom.findMany({
       include: {
-        Chatrooms: {
-          include: {
-            messages: {
-              take: 1,
-              orderBy: { createdAt: 'desc' },
-              select: {
-                author: { select: { username: true } },
-                content: true,
-                createdAt: true,
-              },
-            },
-            users: { select: { username: true, id: true } },
+        messages: {
+          take: 1,
+          orderBy: { createdAt: 'desc' },
+          select: {
+            author: { select: { username: true } },
+            content: true,
+            createdAt: true,
           },
-          orderBy: {
-            updatedAt: 'desc',
-          },
-          cursor,
-          where,
-          skip: query.cursor ? 1 : 0,
-          take: limit,
         },
+        users: { select: { username: true, id: true } },
       },
+      orderBy: { updatedAt: 'desc' },
+      cursor,
+      where,
+      skip: query.cursor ? 1 : 0,
+      take: limit,
     });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const newCursor = user.Chatrooms[limit - 1]?.id;
-    const actualChatrooms = user.Chatrooms.map((chatroom) => {
+    const newCursor = chatrooms[limit - 1]?.id;
+    const actualChatrooms = chatrooms.map((chatroom) => {
       const { messages, ...rest } = chatroom;
       return {
         lastMessage: {

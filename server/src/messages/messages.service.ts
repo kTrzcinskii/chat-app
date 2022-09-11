@@ -83,6 +83,11 @@ export class MessagesService {
       },
     });
 
+    await this.prisma.chatroom.update({
+      where: { id: chatroomId },
+      data: { updatedAt: new Date() },
+    });
+
     return { newMessage };
   }
 }
