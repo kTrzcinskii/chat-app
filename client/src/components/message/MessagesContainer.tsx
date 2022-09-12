@@ -1,6 +1,8 @@
 import jwtDecode from "jwt-decode";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import useGetChatroomMessages from "../../hooks/query/useGetChatroomMessages";
+import Spinner from "../utils/Spinner";
 import MyMessage from "./MyMessage";
 import SomeoneMessage from "./SomeoneMessage";
 
@@ -13,13 +15,22 @@ const MessagesContainer: React.FC<MessagesContainerProps> = ({
   inputHeight,
   chatroomId,
 }) => {
-  const { data, fetchNextPage } = useGetChatroomMessages(chatroomId, 3);
+  const { data, fetchNextPage, isFetching } = useGetChatroomMessages(
+    chatroomId,
+    25
+  );
 
-  console.log(data?.pages);
+  const { ref: fetcherRef, inView } = useInView();
+  useEffect(() => {
+    if (inView) {
+      console.log("veiw");
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView]);
 
   return (
     <div
-      className='w-full overflow-x-hidden overflow-y-scroll no-scrollbar flex flex-col-reverse'
+      className='w-full overflow-x-hidden overflow-y-scroll no-scrollbar flex flex-col-reverse mt-2'
       style={{ height: `calc(100% - ${inputHeight}px)` }}
     >
       {data?.pages.map((page, index) => {
@@ -41,7 +52,8 @@ const MessagesContainer: React.FC<MessagesContainerProps> = ({
           </Fragment>
         );
       })}
-      <button onClick={() => fetchNextPage()}>fetc</button>
+      {isFetching && <Spinner centered={!data} />}
+      <div className='w-full py-[1px]' ref={fetcherRef} />
     </div>
   );
 };
