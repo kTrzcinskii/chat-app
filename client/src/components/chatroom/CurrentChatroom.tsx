@@ -9,7 +9,7 @@ interface CurrentChatroomProps {
 }
 
 const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
-  const MESSAGE_INPUT_HEIGHT = 65;
+  const MESSAGE_INPUT_HEIGHT = 80;
 
   if (chatroomInfo === null) {
     return <Spinner centered />;

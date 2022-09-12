@@ -88,6 +88,6 @@ export class MessagesService {
       data: { updatedAt: new Date() },
     });
 
-    return { newMessage };
+    return { message: newMessage };
   }
 }
