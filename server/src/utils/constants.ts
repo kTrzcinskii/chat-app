@@ -7,3 +7,7 @@ export enum Routes {
 }
 
 export const FRONTEND_ORIGIN = 'http://localhost:3000';
+
+export enum MessageEvents {
+  CREATED = 'messages.created',
+}
