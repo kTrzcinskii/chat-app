@@ -3,6 +3,7 @@ import { BsThreeDots } from "react-icons/bs";
 import MessagesContainer from "../message/MessagesContainer";
 import MessageInput from "../message/MessageInput";
 import Spinner from "../utils/Spinner";
+import { useState } from "react";
 
 interface CurrentChatroomProps {
   chatroomInfo: ExtendedChatroom | null;
@@ -10,6 +11,9 @@ interface CurrentChatroomProps {
 
 const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
   const MESSAGE_INPUT_HEIGHT = 80;
+  const [sendingMessages, setSendingMessages] = useState<
+    { content: string; chatroomId: string }[]
+  >([]);
 
   if (chatroomInfo === null) {
     return <Spinner centered />;
@@ -34,10 +38,13 @@ const CurrentChatroom: React.FC<CurrentChatroomProps> = ({ chatroomInfo }) => {
           <MessagesContainer
             inputHeight={MESSAGE_INPUT_HEIGHT}
             chatroomId={chatroomInfo.id}
+            sendingMessages={sendingMessages}
+            setSendingMessages={setSendingMessages}
           />
           <MessageInput
             inputHeight={MESSAGE_INPUT_HEIGHT}
             chatroomId={chatroomInfo.id}
+            setSendingMessages={setSendingMessages}
           />
         </div>
       </div>

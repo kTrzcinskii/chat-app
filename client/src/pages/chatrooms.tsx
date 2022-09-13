@@ -7,6 +7,7 @@ import { ExtendedChatroom } from "../utils/server-responses-types/ChatroomsCurso
 const Chatrooms: NextPage = () => {
   const [currentChatroomInfo, setCurrentChatroomInfo] =
     useState<ExtendedChatroom | null>(null);
+
   return (
     <div className='flex flex-row h-screen max-h-screen overflow-y-hidden'>
       <div className='w-full min-h-full lg:w-[450px] flex'>

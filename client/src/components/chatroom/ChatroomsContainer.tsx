@@ -1,6 +1,13 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import useGetAllChatroom from "../../hooks/query/useGetAllChatrooms";
 import Avatar from "../utils/Avatar";
 import ErrorMsg from "../utils/ErrorMsg";
@@ -13,6 +20,9 @@ import CreateChatroomModal from "../modals/CreateChatroomModal";
 import { useQueryClient } from "@tanstack/react-query";
 import JoinChatroomModal from "../modals/JoinChatroomModal";
 import { ExtendedChatroom } from "../../utils/server-responses-types/ChatroomsCursor";
+import { SocketContext } from "../../utils/socketContext";
+import useGetCurrentUserId from "../../hooks/useGetCurrentUserId";
+import { MessageEvents } from "../../utils/constants";
 
 interface ChatroomsContainerProps {
   setCurrentChatroomInfo: Dispatch<SetStateAction<ExtendedChatroom | null>>;
@@ -24,8 +34,15 @@ const ChatroomsContainer: React.FC<ChatroomsContainerProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [firstFetch, setFirstFetch] = useState(true);
 
-  const { data, fetchNextPage, isFetching, isError, error, isSuccess } =
-    useGetAllChatroom(8, searchTerm);
+  const {
+    data,
+    fetchNextPage,
+    isFetching,
+    isError,
+    error,
+    isSuccess,
+    refetch,
+  } = useGetAllChatroom(8, searchTerm);
   const { ref: fetcherRef, inView } = useInView();
   const queryClient = useQueryClient();
 
@@ -63,6 +80,17 @@ const ChatroomsContainer: React.FC<ChatroomsContainerProps> = ({
       setFirstFetch(false);
     }
   }, [data, setCurrentChatroomInfo, firstFetch, isSuccess]);
+
+  const socket = useContext(SocketContext);
+
+  const currentUserId = useGetCurrentUserId();
+
+  socket.on(MessageEvents.CREATED, (payload: { users: { id: string }[] }) => {
+    const l = payload.users.filter((user) => user.id === currentUserId).length;
+    if (l !== 0) {
+      refetch();
+    }
+  });
 
   return (
     <>

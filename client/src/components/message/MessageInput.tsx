@@ -1,17 +1,26 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { RiSendPlaneFill } from "react-icons/ri";
 import useSendMessage from "../../hooks/mutation/useSendMessage";
 
 interface MessageInputProps {
   chatroomId: string;
   inputHeight: number;
+  setSendingMessages: Dispatch<
+    SetStateAction<
+      {
+        content: string;
+        chatroomId: string;
+      }[]
+    >
+  >;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
   chatroomId,
   inputHeight,
+  setSendingMessages,
 }) => {
   const [message, setMessage] = useState("");
 
@@ -20,6 +29,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleSubmit = () => {
     if (message !== "") {
+      setSendingMessages((prev) => [{ content: message, chatroomId }, ...prev]);
       mutate(
         { content: message },
         {
